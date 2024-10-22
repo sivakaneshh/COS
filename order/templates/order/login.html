@@ -1,17 +1,97 @@
 {% extends 'base/base.html' %}
 {% block title %}Login Here{% endblock title %}
 {% block maincontent %}
-    <h1>Login Page</h1>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{message.tags}}" role="alert">
-                {{message}}
+<style>
+    /* Custom CSS Styles */
+    body {
+        background-color: #f8f9fa; /* Light background for better contrast */
+        font-family: 'Arial', sans-serif; /* Modern font */
+    }
+
+    .card {
+        border: none; /* Remove default card border */
+        border-radius: 10px; /* Rounded corners for the card */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    }
+
+    .card h1 {
+        font-size: 1.5rem; /* Larger font size for the title */
+        font-weight: 600; /* Bold font for the title */
+        color: #333; /* Darker color for better readability */
+    }
+
+    .form-control {
+        border-radius: 5px; /* Rounded corners for input fields */
+        border: 1px solid #ced4da; /* Soft border */
+        transition: border-color 0.2s ease-in-out; /* Smooth border color transition */
+    }
+
+    .form-control:focus {
+        border-color: #007bff; /* Change border color on focus */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Soft shadow on focus */
+    }
+
+    .btn {
+        border-radius: 5px; /* Rounded corners for buttons */
+        padding: 10px 15px; /* Add padding for a larger click area */
+    }
+
+    .btn-primary {
+        background-color: #007bff; /* Bootstrap primary color */
+        border-color: #007bff; /* Consistent border color */
+        transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth color transition */
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3; /* Darker shade on hover */
+        border-color: #0056b3; /* Consistent border color on hover */
+    }
+
+    .alert {
+        border-radius: 5px; /* Rounded corners for alerts */
+    }
+
+    .text-center a {
+        color: #007bff; /* Link color */
+        text-decoration: none; /* Remove underline */
+    }
+
+    .text-center a:hover {
+        text-decoration: underline; /* Underline on hover for better UX */
+    }
+</style>
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow-lg p-4" style="width: 100%; max-width: 400px;">
+        <h1 class="text-center mb-4">Login</h1>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form action="" method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ form.username.label_tag }}
+                {{ form.username }}  <!-- Use your form fields directly -->
             </div>
-        {% endfor %}
-    {% endif %}
-    <form action="" method="post">
-        {% csrf_token %}
-        {{form.as_p}}
-        <input type="submit" value="Login">
-    </form>
+            <div class="mb-3">
+                {{ form.password.label_tag }}
+                {{ form.password }}  <!-- Use your form fields directly -->
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a  class="text-decoration-none">Forgot password?</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock maincontent %}

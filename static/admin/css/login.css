@@ -1,196 +1,63 @@
 /* General body styling */
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    background-color: #f8f9fa; /* Light background for better contrast */
+    font-family: 'Arial', sans-serif; /* Modern font */
 }
 
-/* Header styling */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 10px 30px;
-    background-color: #343a40;
-    position: fixed;
-    top: 0;
+/* Card styling */
+.card {
+    border: none; /* Remove default card border */
+    border-radius: 10px; /* Rounded corners for the card */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
 }
 
-.logo-container img {
-    height: 50px;
+/* Card header */
+.card h1 {
+    font-size: 1.5rem; /* Larger font size for the title */
+    font-weight: 600; /* Bold font for the title */
+    color: #333; /* Darker color for better readability */
 }
 
-.back {
-    color: #fff;
-    background-color: #007bff;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
+/* Input fields */
+.form-control {
+    border-radius: 5px; /* Rounded corners for input fields */
+    border: 1px solid #ced4da; /* Soft border */
+    transition: border-color 0.2s ease-in-out; /* Smooth border color transition */
 }
 
-.back:hover {
-    background-color: #0056b3;
-    cursor: pointer;
+.form-control:focus {
+    border-color: #007bff; /* Change border color on focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Soft shadow on focus */
 }
 
-/* Container styling */
-.container {
-    width: 100%;
-    max-width: 800px;
-    margin: 120px auto 0; /* Adjusted margin for header */
-    background: #fff;
-    padding: 50px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+/* Button styling */
+.btn {
+    border-radius: 5px; /* Rounded corners for buttons */
+    padding: 10px 15px; /* Add padding for a larger click area */
 }
 
-/* Form heading */
-.heading h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 36px;
-    color: #343a40;
+.btn-primary {
+    background-color: #007bff; /* Bootstrap primary color */
+    border-color: #007bff; /* Consistent border color */
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth color transition */
 }
 
-/* Input box styling */
-.input-box {
-    position: relative;
-    margin-bottom: 30px;
+.btn-primary:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+    border-color: #0056b3; /* Consistent border color on hover */
 }
 
-.input-box input {
-    width: 100%;
-    padding: 15px 20px 15px 50px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    font-size: 18px;
+/* Alert box styling */
+.alert {
+    border-radius: 5px; /* Rounded corners for alerts */
 }
 
-.input-box i {
-    position: absolute;
-    top: 50%;
-    left: 20px;
-    transform: translateY(-50%);
-    font-size: 20px;
-    color: #888;
+/* Forgot password link styling */
+.text-center a {
+    color: #007bff; /* Link color */
+    text-decoration: none; /* Remove underline */
 }
 
-/* Submit button */
-.login-btn {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    font-size: 18px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.login-btn:hover {
-    background-color: #0056b3;
-}
-
-/* Social media section */
-.text {
-    text-align: center;
-    margin: 20px 0;
-    font-size: 16px;
-    color: #555;
-}
-
-.social-media {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-}
-
-.social-media .social-icon {
-    font-size: 24px;
-    color: #343a40;
-    transition: color 0.3s ease;
-}
-
-.social-media .social-icon:hover {
-    color: #007bff;
-}
-
-/* Error message styling */
-.error-message {
-    margin-top: 20px;
-    color: red;
-    font-size: 16px;
-    text-align: center;
-}
-
-/* Signup section */
-.signup {
-    margin-top: 50px;
-    text-align: center;
-}
-
-.signup .text-content {
-    margin-bottom: 20px;
-}
-
-.signup h1 {
-    font-size: 28px;
-    color: #343a40;
-}
-
-.signup p {
-    font-size: 16px;
-    color: #555;
-}
-
-.signup .sign-up {
-    padding: 10px 20px;
-    font-size: 18px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.signup .sign-up:hover {
-    background-color: #218838;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .container {
-        padding: 30px;
-    }
-
-    .heading h1 {
-        font-size: 28px;
-    }
-
-    .input-box input {
-        font-size: 16px;
-        padding: 10px 15px 10px 40px;
-    }
-
-    .login-btn {
-        font-size: 16px;
-        padding: 12px;
-    }
-
-    .signup h1 {
-        font-size: 22px;
-    }
-
-    .signup .sign-up {
-        font-size: 16px;
-        padding: 8px 16px;
-    }
+.text-center a:hover {
+    text-decoration: underline; /* Underline on hover for better UX */
 }

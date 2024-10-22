@@ -1,61 +1,196 @@
-/* LOGIN FORM */
-
-.login {
-    background: var(--darkened-bg);
-    height: auto;
-}
-
-.login #header {
-    height: auto;
-    padding: 15px 16px;
+/* General body styling */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    display: flex;
     justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.login #header h1 {
-    font-size: 1.125rem;
-    margin: 0;
-}
-
-.login #header h1 a {
-    color: var(--header-link-color);
-}
-
-.login #content {
-    padding: 20px 20px 0;
-}
-
-.login #container {
-    background: var(--body-bg);
-    border: 1px solid var(--hairline-color);
-    border-radius: 4px;
-    overflow: hidden;
-    width: 28em;
-    min-width: 300px;
-    margin: 100px auto;
-    height: auto;
-}
-
-.login .form-row {
-    padding: 4px 0;
-}
-
-.login .form-row label {
-    display: block;
-    line-height: 2em;
-}
-
-.login .form-row #id_username, .login .form-row #id_password {
-    padding: 8px;
+/* Header styling */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
-    box-sizing: border-box;
+    padding: 10px 30px;
+    background-color: #343a40;
+    position: fixed;
+    top: 0;
 }
 
-.login .submit-row {
-    padding: 1em 0 0 0;
-    margin: 0;
+.logo-container img {
+    height: 50px;
+}
+
+.back {
+    color: #fff;
+    background-color: #007bff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.back:hover {
+    background-color: #0056b3;
+    cursor: pointer;
+}
+
+/* Container styling */
+.container {
+    width: 100%;
+    max-width: 800px;
+    margin: 120px auto 0; /* Adjusted margin for header */
+    background: #fff;
+    padding: 50px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Form heading */
+.heading h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 36px;
+    color: #343a40;
+}
+
+/* Input box styling */
+.input-box {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 15px 20px 15px 50px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 18px;
+}
+
+.input-box i {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #888;
+}
+
+/* Submit button */
+.login-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Social media section */
+.text {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 16px;
+    color: #555;
+}
+
+.social-media {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.social-media .social-icon {
+    font-size: 24px;
+    color: #343a40;
+    transition: color 0.3s ease;
+}
+
+.social-media .social-icon:hover {
+    color: #007bff;
+}
+
+/* Error message styling */
+.error-message {
+    margin-top: 20px;
+    color: red;
+    font-size: 16px;
     text-align: center;
 }
 
-.login .password-reset-link {
+/* Signup section */
+.signup {
+    margin-top: 50px;
     text-align: center;
+}
+
+.signup .text-content {
+    margin-bottom: 20px;
+}
+
+.signup h1 {
+    font-size: 28px;
+    color: #343a40;
+}
+
+.signup p {
+    font-size: 16px;
+    color: #555;
+}
+
+.signup .sign-up {
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.signup .sign-up:hover {
+    background-color: #218838;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 30px;
+    }
+
+    .heading h1 {
+        font-size: 28px;
+    }
+
+    .input-box input {
+        font-size: 16px;
+        padding: 10px 15px 10px 40px;
+    }
+
+    .login-btn {
+        font-size: 16px;
+        padding: 12px;
+    }
+
+    .signup h1 {
+        font-size: 22px;
+    }
+
+    .signup .sign-up {
+        font-size: 16px;
+        padding: 8px 16px;
+    }
 }

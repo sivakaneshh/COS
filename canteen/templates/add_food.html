@@ -1,0 +1,27 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Add Food Item{% endblock %}
+
+{% block maincontent %}
+<h1>Add Food Item</h1>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">  <!-- Ensure the form supports file upload -->
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Add Food Item</button>
+</form>
+
+<h2>Existing Food Items</h2>
+<ul>
+    {% for food_item in food_items %}
+        <li>{{ food_item.name }} - ${{ food_item.price }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

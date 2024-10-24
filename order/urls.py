@@ -14,4 +14,5 @@ urlpatterns = [
     path('logout/', views.user_logout, name='logout'),
     path('add-food/', views.add_food, name='add_food'),
     path('canteenside/', views.canteenside, name='canteenside'),
+    path('update-order-status/<int:order_id>/', views.update_order_status, name='update_order_status'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

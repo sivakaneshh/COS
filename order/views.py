@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect,redirect
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect,redirect,get_object_or_404, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -108,28 +108,49 @@ def cart(request):
 
 @login_required(login_url='/login/')
 def checkout(request):
-    if(request.method == 'POST'):
-        if(request.POST.get('paymode') == 'Cash'):
-            tn_id = 'CASH' + str(random.randint(111111111111111,999999999999999))
+    if request.method == 'POST':
+        # Determine payment details
+        if request.POST.get('paymode') == 'Cash':
+            tn_id = 'CASH' + str(random.randint(111111111111111, 999999999999999))
             payment_mode = "Cash"
             payment_gateway = "Cash"
-        elif(request.POST.get('paymode') == 'Online' and request.POST.get('paygate') == "Paypal"):
+        elif request.POST.get('paymode') == 'Online' and request.POST.get('paygate') == "Paypal":
             tn_id = request.POST.get('tn_id')
             payment_mode = "Online"
             payment_gateway = "Paypal"
         else:
             return HttpResponse('<H1>Invalid Request</H1>')
+        
+        # Get cart items and create a new order
         cartitems = Cart.objects.filter(username=request.user)
         total_amount = 0
         new_order = Orders(username=request.user, total_amount=total_amount, payment_mode=payment_mode, transaction_id=tn_id, payment_gateway=payment_gateway)
-        new_order.save()
-        if(cartitems):
+        new_order.save()  # Save the new order to get the `order_id`
+
+        # Add items to the order
+        if cartitems:
             for item in cartitems:
-                OrderItems(username=request.user, order=new_order, name=item.food.name, price=item.food.price, quantity=item.quantity, item_total=item.food.price * item.quantity).save()
+                OrderItems(
+                    username=request.user,
+                    order=new_order,
+                    name=item.food.name,
+                    price=item.food.price,
+                    quantity=item.quantity,
+                    item_total=item.food.price * item.quantity
+                ).save()
+
                 sub_total = item.food.price * item.quantity
                 total_amount += sub_total
-            Orders.objects.filter(id=new_order.id).update(total_amount=total_amount)
+
+            # Update the total amount of the order
+            new_order.total_amount = total_amount
+            new_order.save()
+
+        # Clear the cart after checkout
         cartitems.delete()
+
+        # Redirect to 'my orders' page with the new `order_id`
+        messages.success(request, f'Order placed successfully! Your Order ID is {new_order.id}.')
         return HttpResponseRedirect('/myorders/')
     else:
         return HttpResponse('<H1>Invalid Request</H1>')
@@ -175,3 +196,23 @@ def canteenside(request):
         # If not in the "canteen" group, show a permission denied message or redirect
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('/')
+    
+@login_required(login_url='/login/')
+def update_order_status(request, order_id):
+#    if not (request.user.groups.filter(name='canteen').exists() or request.user.is_staff):
+#          messages.error(request, "You are not authorized to update order status.")
+#          return redirect('index')
+#  
+#      order = get_object_or_404(Orders, id=order_id)
+
+   #   if request.method == 'POST':
+      #    new_status = request.POST.get('status')
+        #  i  f new_status in dict(Orders.STATUS_CHOICES).keys():
+           #   order.status = new_status
+            #  order.save()
+            #  messages.success(request, f"Order {order_id} status updated successfully!")
+        #  else:
+           #   messages.error(request, "Invalid status selected.")
+        #  return redirect('canteenside')
+
+    return render(request, 'order/update_status.html')

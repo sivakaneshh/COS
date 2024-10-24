@@ -14,12 +14,13 @@
             {% csrf_token %}
             <div class="mb-3">
                 <label for="status" class="form-label">Status:</label>
-                <select class="form-select" name="status" id="status">
-                    {% for value, label in order.STATUS_CHOICES %}
-                        <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>
-                            {{ label }}
-                        </option>
-                    {% endfor %}
+                <select class="form-select" name="status" id="status" required>
+                    <option value="" disabled>Select Status</option>
+                    <option value="Pending" {% if order.status == "Pending" %}selected{% endif %}>Pending</option>
+                    <option value="Accepted" {% if order.status == "Accepted" %}selected{% endif %}>Accepted</option>
+                    <option value="Cooking" {% if order.status == "Cooking" %}selected{% endif %}>Cooking</option>
+                    <option value="Packed" {% if order.status == "Packed" %}selected{% endif %}>Packed</option>
+                    <option value="Completed" {% if order.status == "Completed" %}selected{% endif %}>Completed</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Update Status</button>

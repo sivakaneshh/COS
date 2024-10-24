@@ -1,29 +1,114 @@
-{% extends 'base/base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-{% block content %}
-<h2>Available Orders</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for order in orders %}
-        <tr>
-            <td>{{ order.id }}</td>
-            <td>{{ order.status }}</td>
-            <td>
-                <a href="{% url 'update_order_status' order.id %}">Update Status</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="3">No orders available.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endblock %}
+    <style>
+        /* Custom Styles */
+        body {
+            font-family: 'Arial', sans-serif; /* Font for the entire page */
+            background-color: #f4f7f8; /* Light background color */
+            color: #333; /* Dark text color */
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #5a5a5a; /* Subtle heading color */
+            text-align: center; /* Center the heading */
+            margin-bottom: 20px; /* Spacing below the heading */
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%; /* Full width */
+            border-collapse: collapse; /* Remove double borders */
+            margin: 0 auto; /* Center the table */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            border-radius: 8px; /* Rounded corners */
+            overflow: hidden; /* Hide overflow */
+        }
+
+        thead {
+            background-color: #007bff; /* Bootstrap primary color */
+            color: white; /* White text for the header */
+        }
+
+        th, td {
+            padding: 12px 15px; /* Padding for table cells */
+            text-align: left; /* Align text to the left */
+            border-bottom: 1px solid #dddddd; /* Light bottom border */
+        }
+
+        tr:hover {
+            background-color: #f1f1f1; /* Highlight row on hover */
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9; /* Zebra stripe effect for even rows */
+        }
+
+        tbody tr td a {
+            color: #007bff; /* Link color */
+            text-decoration: none; /* Remove underline */
+            padding: 8px 12px; /* Padding for links */
+            border-radius: 4px; /* Rounded corners for links */
+            transition: background-color 0.3s; /* Smooth transition for background */
+        }
+
+        tbody tr td a:hover {
+            background-color: #e2e6ea; /* Light grey background on hover */
+            color: #0056b3; /* Darker blue color on hover */
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 600px) {
+            th, td {
+                padding: 8px; /* Reduce padding on smaller screens */
+            }
+
+            h2 {
+                font-size: 1.5em; /* Adjust heading size */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Available Orders</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>
+                        <a href="{% url 'update_order_status' order.id %}" class="btn btn-primary btn-sm">Update Status</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No orders available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS (optional, if you need any Bootstrap features like modals, dropdowns, etc.) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

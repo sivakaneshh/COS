@@ -197,23 +197,28 @@ def canteenside(request):
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('/')
     
+
 @login_required(login_url='/login/')
 def update_order_status(request, order_id):
-    if not (request.user.groups.filter(name='canteen').exists() or request.user.is_staff):
-        messages.error(request, "You are not authorized to update order status.")
-        return redirect('index')
-
+    # Retrieve the specific order by its ID
     order = get_object_or_404(Orders, id=order_id)
 
     if request.method == 'POST':
         new_status = request.POST.get('status')
-        if new_status in dict(Orders.STATUS_CHOICES).keys():
+
+        # Validate the new status against the choices defined in the model
+        if new_status in dict(Orders.STATUS_CHOICES):
             order.status = new_status
             order.save()
             messages.success(request, f"Order {order_id} status updated successfully!")
+            return redirect('canteenside')
         else:
             messages.error(request, "Invalid status selected.")
-        return redirect('canteenside')
+            return redirect('update_order_status', order_id=order_id)
+
+    # Render the form with the current order's details
+    #return render(request, 'update_order_status.html', {'order': order})
+    
 
     return render(request, 'order/update_status.html', {'order': order, 'order_id': order.id})
 

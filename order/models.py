@@ -25,11 +25,14 @@ class Orders(models.Model):
     username = models.ForeignKey(User, on_delete=models.CASCADE)
     total_amount = models.IntegerField()
     order_datetime = models.DateTimeField(auto_now_add=True)
-    payment_mode = models.CharField(max_length=50, choices=PAYMENT_CHOICES)
+    payment_mode = models.CharField(max_length=50, choices=PAYMENT_CHOICES, default="Cash")
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Pending")
     transaction_id = models.CharField(max_length=100)
     payment_gateway = models.CharField(max_length=50)
 
+    def __str__(self):
+        return f"Order {self.id} by {self.username.username} - Status: {self.status}"
+    
 class OrderItems(models.Model):
     username = models.ForeignKey(User, on_delete=models.CASCADE) 
     order = models.ForeignKey("Orders", on_delete=models.CASCADE)

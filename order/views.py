@@ -9,6 +9,7 @@ from .forms import LoginRegisterForm
 import random
 from canteen.forms import FoodItemForm
 from canteen.models import FoodItem
+from django.contrib.auth.models import Group
 
 # Create your views here.
 def index(request):
@@ -144,20 +145,33 @@ def user_logout(request):
     messages.success(request, 'Logout Successfully')
     return HttpResponseRedirect('/')
 
+
+
+
+
+@login_required(login_url='/login/')
 def add_food(request):
-    if request.method == 'POST':
-        form = FoodItemForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Food item added successfully!')
-            return redirect('add_food')  # Redirect back to the add food page after submission
-    else:
-        form = FoodItemForm()
+    if request.user.groups.filter(name='canteen').exists():
+        if request.method == 'POST':
+            form = FoodItemForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Food item added successfully!')
+                return redirect('add_food')  # Redirect back to the add food page after submission
+        else:
+            form = FoodItemForm()
 
     # You can also display existing food items for reference
     food_items = FoodItem.objects.all()
     
     return render(request, 'order/add_food.html', {'form': form, 'food_items': food_items})
 
+@login_required(login_url='/login/')
 def canteenside(request):
-    return render(request, 'order/canteenside.html')
+    # Check if the user belongs to the "canteen" group
+    if request.user.groups.filter(name='canteen').exists():
+        return render(request, 'order/canteenside.html')
+    else:
+        # If not in the "canteen" group, show a permission denied message or redirect
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('/')

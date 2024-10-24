@@ -12,4 +12,6 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('myorders/', views.my_orders, name='my-orders'),
     path('logout/', views.user_logout, name='logout'),
+    path('add-food/', views.add_food, name='add_food'),
+    path('canteenside/', views.canteenside, name='canteenside'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

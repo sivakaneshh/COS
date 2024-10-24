@@ -1,5 +1,5 @@
 from django import forms
-from .models import FoodItem, Orders
+from .models import FoodItem
 
 # Form to Add/Update Food Items (including image upload)
 class FoodItemForm(forms.ModelForm):

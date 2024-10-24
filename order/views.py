@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect,redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -7,6 +7,8 @@ from canteen.models import FoodItem
 from .models import Cart, Orders, OrderItems
 from .forms import LoginRegisterForm
 import random
+from canteen.forms import FoodItemForm
+from canteen.models import FoodItem
 
 # Create your views here.
 def index(request):
@@ -141,3 +143,21 @@ def user_logout(request):
     logout(request)
     messages.success(request, 'Logout Successfully')
     return HttpResponseRedirect('/')
+
+def add_food(request):
+    if request.method == 'POST':
+        form = FoodItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Food item added successfully!')
+            return redirect('add_food')  # Redirect back to the add food page after submission
+    else:
+        form = FoodItemForm()
+
+    # You can also display existing food items for reference
+    food_items = FoodItem.objects.all()
+    
+    return render(request, 'order/add_food.html', {'form': form, 'food_items': food_items})
+
+def canteenside(request):
+    return render(request, 'order/canteenside.html')

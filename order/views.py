@@ -199,20 +199,26 @@ def canteenside(request):
     
 @login_required(login_url='/login/')
 def update_order_status(request, order_id):
-#    if not (request.user.groups.filter(name='canteen').exists() or request.user.is_staff):
-#          messages.error(request, "You are not authorized to update order status.")
-#          return redirect('index')
-#  
-#      order = get_object_or_404(Orders, id=order_id)
+    if not (request.user.groups.filter(name='canteen').exists() or request.user.is_staff):
+        messages.error(request, "You are not authorized to update order status.")
+        return redirect('index')
 
-   #   if request.method == 'POST':
-      #    new_status = request.POST.get('status')
-        #  i  f new_status in dict(Orders.STATUS_CHOICES).keys():
-           #   order.status = new_status
-            #  order.save()
-            #  messages.success(request, f"Order {order_id} status updated successfully!")
-        #  else:
-           #   messages.error(request, "Invalid status selected.")
-        #  return redirect('canteenside')
+    order = get_object_or_404(Orders, id=order_id)
 
-    return render(request, 'order/update_status.html')
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status in dict(Orders.STATUS_CHOICES).keys():
+            order.status = new_status
+            order.save()
+            messages.success(request, f"Order {order_id} status updated successfully!")
+        else:
+            messages.error(request, "Invalid status selected.")
+        return redirect('canteenside')
+
+    return render(request, 'order/update_status.html', {'order': order, 'order_id': order.id})
+
+@login_required(login_url='/login/')
+def list_orders(request):
+    orders = Orders.objects.all()
+    print(f"Retrieved orders: {orders}")  # Debugging line to print orders
+    return render(request, 'order/list_orders.html', {'orders': orders})

@@ -15,6 +15,7 @@
         {% endfor %}
     {% endif %}
 
+    <!-- Form to add a new food item -->
     <form method="post" enctype="multipart/form-data" class="bg-light p-4 rounded shadow">
         {% csrf_token %}
         <div class="mb-3">
@@ -23,12 +24,23 @@
         <button type="submit" class="btn btn-primary btn-lg w-100">Add Food Item</button>
     </form>
 
+    <!-- List of existing food items -->
     <h2 class="mt-5">Existing Food Items</h2>
     <ul class="list-group">
         {% for food_item in food_items %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ food_item.name }}
-                <span class="badge bg-secondary">${{ food_item.price }}</span>
+                <div>
+                    {{ food_item.name }}
+                </div>
+                <div>
+                    <span class="badge bg-secondary">${{ food_item.price }}</span>
+                    <!-- Delete form for each food item -->
+                    <form method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this food item?');">
+                        {% csrf_token %}
+                        <input type="hidden" name="food_id" value="{{ food_item.id }}">
+                        <button type="submit" name="delete_food" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
             </li>
         {% endfor %}
     </ul>

@@ -172,7 +172,18 @@ def user_logout(request):
 
 @login_required(login_url='/login/')
 def add_food(request):
+    # Check if the user belongs to the "canteen" group
     if request.user.groups.filter(name='canteen').exists():
+        
+        # Handle food deletion
+        if request.method == 'POST' and 'delete_food' in request.POST:
+            food_id = request.POST.get('food_id')
+            food_item_to_delete = FoodItem.objects.get(id=food_id)
+            food_item_to_delete.delete()
+            messages.success(request, 'Food item deleted successfully!')
+            return redirect('add_food')  # Redirect back after deletion
+
+        # Handle adding new food
         if request.method == 'POST':
             form = FoodItemForm(request.POST, request.FILES)
             if form.is_valid():
@@ -182,10 +193,16 @@ def add_food(request):
         else:
             form = FoodItemForm()
 
-    # You can also display existing food items for reference
-    food_items = FoodItem.objects.all()
+        # Display existing food items for reference
+        food_items = FoodItem.objects.all()
     
-    return render(request, 'order/add_food.html', {'form': form, 'food_items': food_items})
+        return render(request, 'order/add_food.html', {'form': form, 'food_items': food_items})
+    
+    # If the user is not part of the "canteen" group, deny access
+    else:
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('/')
+
 
 @login_required(login_url='/login/')
 def canteenside(request):
@@ -198,16 +215,14 @@ def canteenside(request):
         return redirect('/')
     
 
-@login_required(login_url='/login/')
 def update_order_status(request, order_id):
-    # Retrieve the specific order by its ID
     order = get_object_or_404(Orders, id=order_id)
 
     if request.method == 'POST':
         new_status = request.POST.get('status')
 
         # Validate the new status against the choices defined in the model
-        if new_status in dict(Orders.STATUS_CHOICES):
+        if new_status in dict(Orders.STATUS_CHOICES):  # Use the top-level STATUS_CHOICES
             order.status = new_status
             order.save()
             messages.success(request, f"Order {order_id} status updated successfully!")
@@ -215,6 +230,8 @@ def update_order_status(request, order_id):
         else:
             messages.error(request, "Invalid status selected.")
             return redirect('update_order_status', order_id=order_id)
+
+    
 
     # Render the form with the current order's details
     #return render(request, 'update_order_status.html', {'order': order})

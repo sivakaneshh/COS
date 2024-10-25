@@ -79,7 +79,8 @@
 </head>
 <body>
     <div class="container">
-        <h2>Available Orders</h2>
+        <h2><a href="{% url 'canteenside' %}">Available Orders</a></h2>
+
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -92,9 +93,27 @@
                 {% for order in orders %}
                 <tr>
                     <td>{{ order.id }}</td>
-                    <td>{{ order.status }}</td>
                     <td>
-                        <a href="{% url 'update_order_status' order.id %}" class="btn btn-primary btn-sm">Update Status</a>
+                        <!-- Dropdown for updating order status -->
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <select name="status" class="form-control form-control-sm" 
+                                    {% if order.status == 'Completed' %} disabled {% endif %} 
+                                    onchange="this.form.submit()">
+                                {% for status_value, status_label in order.STATUS_CHOICES %}
+                                    <option value="{{ status_value }}" 
+                                        {% if order.status == status_value %} selected {% endif %}>
+                                        {{ status_label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </td>
+                    <td>
+                        <!-- Disable Update Status button if order is completed -->
+                        <a href="#" class="btn btn-secondary btn-sm 
+                            {% if order.status == 'Completed' %} disabled {% endif %}">Update Status</a>
                     </td>
                 </tr>
                 {% empty %}

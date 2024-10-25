@@ -241,6 +241,32 @@ def update_order_status(request, order_id):
 
 @login_required(login_url='/login/')
 def list_orders(request):
+    if request.method == 'POST':
+        # Handling the form submission to update the order status
+        order_id = request.POST.get('order_id')  # Get the order ID from the form
+        new_status = request.POST.get('status')  # Get the new status from the form
+
+        try:
+            # Fetch the order object by its ID
+            order = Orders.objects.get(id=order_id)
+            # Update the order status
+            order.status = new_status
+            order.save()  # Save the updated status to the database
+
+            # Show success message after updating
+            messages.success(request, f"Order {order_id} status updated successfully.")
+        except Orders.DoesNotExist:
+            # Handle case where order is not found
+            messages.error(request, "Order not found.")
+        
+        # Redirect back to the same page to avoid re-posting the form
+        return redirect('list_orders')
+
+    # Fetch all orders to display in the template
     orders = Orders.objects.all()
-    print(f"Retrieved orders: {orders}")  # Debugging line to print orders
+
+    # Debugging line to print orders in the console
+    print(f"Retrieved orders: {orders}")
+
+    # Pass the list of orders to the template
     return render(request, 'order/list_orders.html', {'orders': orders})

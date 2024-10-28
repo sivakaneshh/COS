@@ -1,0 +1,63 @@
+/* General body styling */
+body {
+    background-color: #f8f9fa; /* Light background for better contrast */
+    font-family: 'Arial', sans-serif; /* Modern font */
+}
+
+/* Card styling */
+.card {
+    border: none; /* Remove default card border */
+    border-radius: 10px; /* Rounded corners for the card */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+}
+
+/* Card header */
+.card h1 {
+    font-size: 1.5rem; /* Larger font size for the title */
+    font-weight: 600; /* Bold font for the title */
+    color: #333; /* Darker color for better readability */
+}
+
+/* Input fields */
+.form-control {
+    border-radius: 5px; /* Rounded corners for input fields */
+    border: 1px solid #ced4da; /* Soft border */
+    transition: border-color 0.2s ease-in-out; /* Smooth border color transition */
+}
+
+.form-control:focus {
+    border-color: #007bff; /* Change border color on focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Soft shadow on focus */
+}
+
+/* Button styling */
+.btn {
+    border-radius: 5px; /* Rounded corners for buttons */
+    padding: 10px 15px; /* Add padding for a larger click area */
+}
+
+.btn-primary {
+    background-color: #007bff; /* Bootstrap primary color */
+    border-color: #007bff; /* Consistent border color */
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth color transition */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+    border-color: #0056b3; /* Consistent border color on hover */
+}
+
+/* Alert box styling */
+.alert {
+    border-radius: 5px; /* Rounded corners for alerts */
+}
+
+/* Forgot password link styling */
+.text-center a {
+    color: #007bff; /* Link color */
+    text-decoration: none; /* Remove underline */
+}
+
+.text-center a:hover {
+    text-decoration: underline; /* Underline on hover for better UX */
+}

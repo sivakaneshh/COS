@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+
+
+  db:
+
+    image: mysql
+    container_name: cos-db
+    restart: always
+
+    ports:
+      - "5500:3306"
+
+    environment:
+      MYSQL_ROOT_PASSWORD: cospass
+      MYSQL_DATABASE: cos-db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: cos-pass
+    
+    volumes:
+      - storage:/var/lib/mysql
+    
+    networks:
+      - kgcos
+
+volumes:
+  storage:
+    name: "cos"
+
+
+networks:
+  kgcos:
+    driver: bridge

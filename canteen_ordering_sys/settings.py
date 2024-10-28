@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -74,21 +74,17 @@ WSGI_APPLICATION = "canteen_ordering_sys.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'cos-db',
+        "HOST": "localhost",
+        "PORT": 5500,
+        "USER": "user",
+        "PASSWORD": "cos-pass"
     }
-    # "default": {
-    #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": "canteen_db",
-    #     "USER": "admin",
-    #     "PASSWORD": "admin",
-    #     "HOST": "127.0.0.1",
-    #     "PORT": "5432",
-    # }
 }
+
 
 
 # Password validation
@@ -125,7 +121,22 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "static/"
+# settings.py
+
+# URL to use when referring to static files
+# settings.py
+
+# URL for static files
+STATIC_URL = '/static/'
+
+# Directory where Django will collect static files during deployment
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Directories where Django will search for static files (in development)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Do NOT include STATIC_ROOT here
+]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -133,8 +144,6 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 import os
-
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # MEDIA_URL= 'food_pic/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'food_pic')

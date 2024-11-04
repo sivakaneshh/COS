@@ -1,33 +1,83 @@
 version: '3.8'
 
 services:
-
-
   db:
-
     image: mysql
     container_name: cos-db
     restart: always
-
     ports:
       - "5500:3306"
-
     environment:
       MYSQL_ROOT_PASSWORD: cospass
       MYSQL_DATABASE: cos-db
       MYSQL_USER: user
       MYSQL_PASSWORD: cos-pass
-    
     volumes:
       - storage:/var/lib/mysql
-    
+    networks:
+      - kgcos
+
+  redis:
+    image: redis:alpine
+    container_name: cos-redis
+    networks:
+      - kgcos
+
+  web:
+    build: .
+    container_name: canteen_ordering_web
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "canteen_ordering_sys.wsgi:application"]
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_NAME=cos-db
+      - DB_USER=user
+      - DB_PASSWORD=cos-pass
+      - DB_HOST=db
+      - DB_PORT=3306
+    networks:
+      - kgcos
+
+  celery:
+    build: .
+    container_name: cos-celery
+    command: celery -A canteen_ordering_sys worker --loglevel=info
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_NAME=cos-db
+      - DB_USER=user
+      - DB_PASSWORD=cos-pass
+      - DB_HOST=db
+      - DB_PORT=3306
+    networks:
+      - kgcos
+
+  celery-beat:
+    build: .
+    container_name: cos-celery-beat
+    command: celery -A canteen_ordering_sys beat --loglevel=info
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_NAME=cos-db
+      - DB_USER=user
+      - DB_PASSWORD=cos-pass
+      - DB_HOST=db
+      - DB_PORT=3306
     networks:
       - kgcos
 
 volumes:
   storage:
     name: "cos"
-
 
 networks:
   kgcos:

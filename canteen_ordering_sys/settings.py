@@ -28,6 +28,9 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/1'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -79,7 +82,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'cos-db',
         "HOST": "localhost",
-        "PORT": 5500,
+        "PORT": "5500",
         "USER": "user",
         "PASSWORD": "cos-pass"
     }
@@ -143,7 +146,3 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-import os
-
-# MEDIA_URL= 'food_pic/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'food_pic')

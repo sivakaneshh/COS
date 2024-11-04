@@ -5,3 +5,6 @@ sqlparse==0.4.4
 tzdata==2023.3
 mysqlclient
 gunicorn
+celery
+celery[redis]==5.2.7  
+redis==4.3.4          

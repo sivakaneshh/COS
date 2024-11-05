@@ -5,10 +5,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from canteen.models import FoodItem
 from .models import Cart, Orders, OrderItems
+from .forms import LoginRegisterForm
+import random
 from canteen.forms import FoodItemForm
 from canteen.models import FoodItem
 from django.contrib.auth.models import Group
-import random
+
 
 # Create your views here.
 def index(request):

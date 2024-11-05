@@ -4,73 +4,157 @@
 
 <style>
     body {
-        background-color: #f8f9fa; /* Light background for a fresh look */
+        background-color: #f8f9fa;
     }
     .card {
-        border-radius: 15px; /* Rounded card corners */
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        margin-bottom: 15px;
+    }
+    .food-card {
+        overflow: hidden;
+    }
+    .food-image {
+        height: 140px;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 12px 12px 0 0;
+    }
+    @media (min-width: 768px) {
+        .food-image {
+            border-radius: 12px 0 0 12px;
+            height: 180px;
+        }
+    }
+    .card-body {
+        padding: 1rem;
     }
     .card-title {
-        font-weight: bold; /* Emphasize card titles */
-        font-size: 1.25rem; /* Increase font size for titles */
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
     }
-    .border-primary {
-        border-color: #007bff !important; /* Primary color border */
+    .food-description {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
     }
-    .btn {
-        border-radius: 10px; /* Rounded button corners */
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .quantity-controls .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    .price-box {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    .price-box-title {
+        font-size: 0.875rem;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    .price-box-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #212529;
     }
     .total-amount {
-        font-size: 1.5rem; /* Larger font for total amount */
-        color: #28a745; /* Green color for total amount */
-        font-weight: bold; /* Make it bold */
+        font-size: 1.5rem;
+        color: #28a745;
+        font-weight: bold;
+    }
+    .payment-buttons {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1rem;
     }
     .alert {
-        border-radius: 10px; /* Rounded alert corners */
+        border-radius: 8px;
+        font-size: 0.9rem;
+        margin: 1rem 0;
+    }
+    .cart-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+    .info-note {
+        background-color: #fff3cd;
+        border: 2px solid #ffeeba;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+    #paypal-button-container {
+        margin-bottom: 1rem;
     }
 </style>
 
-<div class="container mt-5">
+<div class="cart-container">
     {% if cartitems %}
-        <div class="row border rounded-5 border-primary m-3 p-4 bg-white">
-            <div class="col-12 col-md-8">
+        <div class="row g-4">
+            <div class="col-12 col-lg-8">
                 {% for item in cartitems %}
-                    <div class="card mb-3">
+                    <div class="card food-card">
                         <div class="row g-0">
-                            <div class="col-4 col-md-4">
-                                <img src="{{item.food.image.url}}" class="img-fluid rounded-start" style="height: 180px; width: 100%; object-fit: cover;">
+                            <div class="col-12 col-md-4">
+                                <img src="{{item.food.image.url}}" class="food-image" alt="{{item.food.name}}">
                             </div>
-                            <div class="col-8 col-md-8">
+                            <div class="col-12 col-md-8">
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h5 class="card-title">{{item.food.name | title}}</h5>
-                                            <p class="card-text">{{item.food.description | title}}</p>
-                                        </div>
-                                        <div>
-                                            <a class="btn btn-danger" href="{% url 'update-cart' item.food.id %}?name=delete_cart_item"><i class="fa-solid fa-trash"></i></a>
-                                        </div>
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="card-title">{{item.food.name | title}}</h5>
+                                        <a class="btn btn-sm btn-danger" href="{% url 'update-cart' item.food.id %}?name=delete_cart_item">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </a>
                                     </div>
-                                    <div class="d-flex justify-content-between text-center mt-2">
-                                        <div class="border rounded p-2 flex-grow-1 mx-1">
-                                            <h5 class="card-title border-bottom m-1">Price</h5>
-                                            <h5 class="card-title">{{item.food.price | title}}</h5>
-                                        </div>
-                                        <div class="border rounded p-2 flex-grow-1 mx-1">
-                                            <h5 class="card-title border-bottom m-1">Quantity</h5>
-                                            <div class="d-flex align-items-center justify-content-center">
-                                                {% if item.quantity == 1 %}
-                                                    <a class="btn btn-danger" href="{% url 'update-cart' item.food.id %}?name=delete_cart_item"><i class="fa-solid fa-trash"></i></a>
-                                                {% else %}
-                                                    <a class="btn btn-warning" href="{% url 'update-cart' item.food.id %}?name=decrease_cart"><i class="fa-solid fa-minus"></i></a>
-                                                {% endif %}
-                                                <h5 class="card-title mx-2">{{item.quantity}}</h5>
-                                                <a class="btn btn-primary" href="{% url 'update-cart' item.food.id %}?name=increase_cart"><i class="fa-solid fa-plus"></i></a>
+                                    <p class="food-description">{{item.food.description | title}}</p>
+                                    
+                                    <div class="row g-2 mt-2">
+                                        <div class="col-4">
+                                            <div class="price-box text-center">
+                                                <div class="price-box-title">Price</div>
+                                                <div class="price-box-value">{{item.food.price}}</div>
                                             </div>
                                         </div>
-                                        <div class="border rounded p-2 flex-grow-1 mx-1">
-                                            <h5 class="card-title border-bottom m-1">Amount</h5>
-                                            <h5 class="card-title m-1">{% widthratio item.food.price 1 item.quantity %}</h5>
+                                        <div class="col-4">
+                                            <div class="price-box text-center">
+                                                <div class="price-box-title">Quantity</div>
+                                                <div class="quantity-controls">
+                                                    {% if item.quantity == 1 %}
+                                                        <a class="btn btn-sm btn-danger" href="{% url 'update-cart' item.food.id %}?name=delete_cart_item">
+                                                            <i class="fa-solid fa-trash"></i>
+                                                        </a>
+                                                    {% else %}
+                                                        <a class="btn btn-sm btn-warning" href="{% url 'update-cart' item.food.id %}?name=decrease_cart">
+                                                            <i class="fa-solid fa-minus"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                    <span class="price-box-value">{{item.quantity}}</span>
+                                                    <a class="btn btn-sm btn-primary" href="{% url 'update-cart' item.food.id %}?name=increase_cart">
+                                                        <i class="fa-solid fa-plus"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="price-box text-center">
+                                                <div class="price-box-title">Amount</div>
+                                                <div class="price-box-value">{% widthratio item.food.price 1 item.quantity %}</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -79,46 +163,56 @@
                     </div>
                 {% endfor %}
             </div>
-            <div class="col-12 col-md-4">
-                <div class="card mb-3">
+            
+            <div class="col-12 col-lg-4">
+                <div class="card">
                     <div class="card-body">
-                        <h3 class="border-bottom">Total Amount:</h3>
-                        <ul class="list-group">
+                        <h3 class="card-title border-bottom pb-2">Order Summary</h3>
+                        <ul class="list-group list-group-flush">
                             {% for item in cartitems %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">{{item.food.name}}
+                                <li class="list-group-item d-flex justify-content-between py-2">
+                                    <span>{{item.food.name}}</span>
                                     <span>{% widthratio item.food.price 1 item.quantity %}</span>
                                 </li>
                             {% endfor %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center border-0 border-top px-0 mb-3 mt-3">
-                                <strong>Total</strong>
+                            <li class="list-group-item d-flex justify-content-between py-3">
+                                <strong>Total Amount</strong>
                                 <strong class="total-amount">{{total_amount}}</strong>
                             </li>
                         </ul>
-                        <div class="d-grid">
+                        
+                        <div class="payment-buttons">
                             <form action="/checkout/" method="post" id="paypalform">
                                 {% csrf_token %}
                                 <input type="hidden" name="paymode" value="Online">
                                 <input type="hidden" name="paygate" value="Paypal">
                                 <div id="paypal-button-container"></div>
                             </form>
+                            
                             <form action="/checkout/" method="post" id="cashform">
                                 {% csrf_token %}
                                 <input type="hidden" name="paymode" value="Cash">
-                                <div class="d-grid">
-                                    <input type="submit" class="btn btn-primary p-2 fw-semibold" value="Pay Cash On Delivery">
-                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-2">
+                                    Pay Cash On Delivery
+                                </button>
                             </form>
                         </div>
                     </div>
                 </div>
-                <h5 class="alert alert-warning text-center mt-3 p-2 border border-warning border-3">Note: You Can Collect Your Order from Canteen When <strong>Status</strong> is <strong>Packed</strong> in <a href="{% url 'my-orders' %}">My Orders</a> Page</h5>
+                
+                <div class="info-note">
+                    <strong>Note:</strong> You can collect your order from the canteen when the 
+                    <strong>Status</strong> is <strong>Packed</strong> in your 
+                    <a href="{% url 'my-orders' %}">My Orders</a> page
+                </div>
             </div>
         </div>
-    </div>
-    <div id="os"></div>
-{% else %}
-    <h1 class="alert alert-info text-center mt-5">Your Cart is Empty</h1>
-{% endif %}
+    {% else %}
+        <div class="alert alert-info text-center my-5">
+            <h4 class="mb-0">Your Cart is Empty</h4>
+        </div>
+    {% endif %}
+</div>
 
 {% endblock maincontent %}
 
@@ -126,9 +220,7 @@
 <script src="https://www.paypal.com/sdk/js?client-id=AdstVdkXtBT7eFeAKT1PuFTYmnm3a9HgAeyqXiJtxNKFQJav05K7ljkgv6e1EbefJo_crAAgYXsElPcf&currency=USD"></script>
 
 <script>
-    // Render the PayPal button into #paypal-button-container
     paypal.Buttons({
-        // Set up the transaction
         createOrder: function(data, actions) {
             return actions.order.create({
                 purchase_units: [{
@@ -138,20 +230,18 @@
                 }]
             });
         },
-
-        // Finalize the transaction
         onApprove: function(data, actions) {
             return actions.order.capture().then(function(orderData) {
                 var transaction = orderData.purchase_units[0].payments.captures[0];
                 alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nOrder Placed Successfully' + '\nClick OK to Proceed Further');
-
+                
                 var form = document.getElementById('paypalform');
                 var hidnInp = document.createElement("input");
                 hidnInp.setAttribute('type', 'hidden');
                 hidnInp.setAttribute('name', 'tn_id');
                 hidnInp.setAttribute('value', transaction.id);
                 form.appendChild(hidnInp);
-                document.getElementById('paypalform').submit();
+                form.submit();
             });
         }
     }).render('#paypal-button-container');

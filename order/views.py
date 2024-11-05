@@ -10,6 +10,7 @@ import random
 from canteen.forms import FoodItemForm
 from canteen.models import FoodItem
 from django.contrib.auth.models import Group
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -171,38 +172,65 @@ def user_logout(request):
 
 
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import FoodItem
+from .forms import FoodItemForm
+
 @login_required(login_url='/login/')
 def add_food(request):
     # Check if the user belongs to the "canteen" group
     if request.user.groups.filter(name='canteen').exists():
-        
+
         # Handle food deletion
         if request.method == 'POST' and 'delete_food' in request.POST:
             food_id = request.POST.get('food_id')
-            food_item_to_delete = FoodItem.objects.get(id=food_id)
+            food_item_to_delete = get_object_or_404(FoodItem, id=food_id)
             food_item_to_delete.delete()
             messages.success(request, 'Food item deleted successfully!')
             return redirect('add_food')  # Redirect back after deletion
 
         # Handle adding new food
-        if request.method == 'POST':
+        if request.method == 'POST' and 'add_food' in request.POST:
             form = FoodItemForm(request.POST, request.FILES)
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Food item added successfully!')
-                return redirect('add_food')  # Redirect back to the add food page after submission
+                return redirect('add_food')  # Redirect back after adding
+
+        # Handle updating stock
+        elif request.method == 'POST' and 'update_stock' in request.POST:
+            food_id = request.POST.get('food_id')
+            new_stock = request.POST.get('new_stock')
+            food_item = get_object_or_404(FoodItem, id=food_id)
+            
+            # Update the stock quantity
+            try:
+                food_item.stock_quantity = int(new_stock)
+                food_item.save()
+                messages.success(request, 'Stock updated successfully!')
+            except ValueError:
+                messages.error(request, 'Invalid stock quantity. Please enter a valid number.')
+
+            return redirect('add_food')  # Redirect back after stock update
+
         else:
             form = FoodItemForm()
 
         # Display existing food items for reference
         food_items = FoodItem.objects.all()
-    
-        return render(request, 'order/add_food.html', {'form': form, 'food_items': food_items})
-    
+
+        return render(request, 'order/add_food.html', {
+            'form': form,
+            'food_items': food_items
+        })
+
     # If the user is not part of the "canteen" group, deny access
     else:
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('/')
+
 
 
 @login_required(login_url='/login/')
@@ -284,3 +312,9 @@ def buy_now(request, food_id):
 
     # Redirect to the cart page for review or checkout
     return redirect('cart')
+
+def clear_completed_orders(request):
+    if request.method == 'DELETE':
+        Orders.objects.filter(status='Completed').delete()
+        return JsonResponse({'message': 'Completed orders cleared successfully.'}, status=200)
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)

@@ -12,7 +12,7 @@
 
     /* Card styling */
     .card {
-        width: 16rem;
+        width: 18rem;
         margin: 1rem;
         border-radius: 10px;
         overflow: hidden;
@@ -24,11 +24,13 @@
     }
 
     /* Image styling */
-    .card img {
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-        height: 180px;
+    .card-img-top {
+        height: 220px;
         object-fit: cover;
+    }
+    /* Grayscale filter for out-of-stock items */
+    .out-of-stock img {
+        filter: grayscale(100%);
     }
 
     /* Card body styling */
@@ -73,61 +75,34 @@
         gap: 0.3rem;
         margin-bottom: 0.5rem;
     }
-
 </style>
 
 <div class="food-container">
     {% for f in food %}
         <div class="card">
-            <img src="{{ f.image.url }}" class="card-img-top" alt="Image not found">
+            <!-- Apply 'out-of-stock' class to grayscale image if stock is 0 -->
+            <div class="{% if f.stock_quantity == 0 %}out-of-stock{% endif %}">
+                <img src="{{ f.image.url }}" class="card-img-top" alt="Image not found">
+            </div>
             <div class="card-body">
                 <h3 class="card-title">{{ f.name | title }}</h3>
                 <h5 class="price">Price - ₹{{ f.price }}</h5>
                 <p class="card-text">{{ f.description | title }}</p>
 
-                {% with in_cart=False %}
-                    {% for item in cartitems %}
-                        {% if f.name == item.0 and item.1 != '0' %}
-                            {% with in_cart=True %}
-
-                            <!-- Quantity controls for items in cart -->
-                            <div class="button-group">
-                                {% if item.1 == 1 %}
-                                    <a class="btn btn-danger" href="{% url 'update-cart' f.id %}?name=delete_cart_item">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </a>
-                                {% else %}
-                                    <a class="btn btn-warning" href="{% url 'update-cart' f.id %}?name=decrease_cart">
-                                        <i class="fa-solid fa-minus"></i>
-                                    </a>
-                                {% endif %}
-                                <span class="card-title">{{ item.1 }}</span>
-                                <a class="btn btn-primary" href="{% url 'update-cart' f.id %}?name=increase_cart">
-                                    <i class="fa-solid fa-plus"></i>
-                                </a>
-                            </div>
-
-                            <!-- "View Cart" button shown only when item is in the cart -->
-                            <a href="{% url 'cart' %}" class="btn btn-info w-100">
-                                <i class="fa-solid fa-shopping-cart"></i> View Cart
-                            </a>
-
-                            {% endwith %}
-                        {% endif %}
-                    {% endfor %}
-                    
-                    {% if not in_cart %}
-                        <!-- "Add to Cart" and "Buy Now" buttons if not in the cart -->
-                        <div class="button-group">
-                            <a href="{% url 'update-cart' f.id %}" class="btn btn-success">
-                                <i class="fa-solid fa-cart-shopping"></i> Add to Cart
-                            </a>
-                            <a href="{% url 'buy-now' f.id %}" class="btn btn-primary">
-                                <i class="fa-solid fa-credit-card"></i> Buy Now
-                            </a>
-                        </div>
-                    {% endif %}
-                {% endwith %}
+                {% if f.stock_quantity > 0 %}
+                    <!-- Only show Add to Cart and Buy Now buttons if in stock -->
+                    <div class="button-group">
+                        <a href="{% url 'update-cart' f.id %}" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                        </a>
+                        <a href="{% url 'buy-now' f.id %}" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-credit-card"></i> Buy Now
+                        </a>
+                    </div>
+                {% else %}
+                    <!-- Show "Out of Stock" message if not in stock -->
+                    <span class="text-danger">Out of Stock</span>
+                {% endif %}
             </div>
         </div>
     {% endfor %}

@@ -17,5 +17,6 @@ urlpatterns = [
     path('update_order_status/<int:order_id>/', views.update_order_status, name='update_order_status'),
     path('orders/', views.list_orders, name='list_orders'),
     path('buy-now/<int:food_id>/', views.buy_now, name='buy-now'),
+    path('clear-completed-orders/', views.clear_completed_orders, name='clear_completed_orders'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

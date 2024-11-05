@@ -1,36 +1,135 @@
 {% extends 'base/base.html' %}
 {% block title %}Order Food From Your College Canteen{% endblock title %}
+
 {% block maincontent %}
-    <div style="display: flex; flex-wrap: wrap;">
-        {% for f in food %}
-            <div class="card shadow-lg m-2" style="width:18rem;">
-                <img src="{{f.image.url}}" class="card-img-top" style="height:220px;" alt='image not found'>
-                <div class="card-body">
-                    <h3 class="card-title">{{f.name | title}}</h3>
-                    <h5 class="card-title">Price - {{f.price | title}}</h5>
-                    <p class="card-text">Description - {{f.description | title}}</p>
+<style>
+    /* Page layout styling */
+    .food-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* Card styling */
+    .card {
+        width: 16rem;
+        margin: 1rem;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: scale(1.05);
+    }
+
+    /* Image styling */
+    .card img {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        height: 180px;
+        object-fit: cover;
+    }
+
+    /* Card body styling */
+    .card-body {
+        padding: 0.8rem;
+        text-align: center;
+    }
+
+    /* Title and price styling */
+    .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0.2rem 0;
+    }
+    .price {
+        color: #555;
+        font-weight: 500;
+        margin: 0.2rem 0;
+    }
+    .card-text {
+        font-size: 0.9rem;
+        color: #777;
+        margin-bottom: 0.8rem;
+    }
+
+    /* Button styling */
+    .btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.5rem;
+        margin: 0.1rem;
+    }
+    .btn-primary { background-color: #007bff; color: white; }
+    .btn-success { background-color: #28a745; color: white; }
+    .btn-warning { background-color: #ffc107; color: black; }
+    .btn-danger { background-color: #dc3545; color: white; }
+    .btn-info { background-color: #17a2b8; color: white; }
+
+    /* Button layout adjustments */
+    .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 0.3rem;
+        margin-bottom: 0.5rem;
+    }
+
+</style>
+
+<div class="food-container">
+    {% for f in food %}
+        <div class="card">
+            <img src="{{ f.image.url }}" class="card-img-top" alt="Image not found">
+            <div class="card-body">
+                <h3 class="card-title">{{ f.name | title }}</h3>
+                <h5 class="price">Price - ₹{{ f.price }}</h5>
+                <p class="card-text">{{ f.description | title }}</p>
+
+                {% with in_cart=False %}
                     {% for item in cartitems %}
                         {% if f.name == item.0 and item.1 != '0' %}
-                            <div class="d-flex float-bottom">
+                            {% with in_cart=True %}
+
+                            <!-- Quantity controls for items in cart -->
+                            <div class="button-group">
                                 {% if item.1 == 1 %}
-                                    <a class="btn btn-danger" href="{% url 'update-cart' f.id %}?name=delete_cart_item"><i class="fa-solid fa-trash"></i></a>
+                                    <a class="btn btn-danger" href="{% url 'update-cart' f.id %}?name=delete_cart_item">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
                                 {% else %}
-                                    <a class="btn btn-warning" href="{% url 'update-cart' f.id %}?name=decrease_cart"><i class="fa-solid fa-minus"></i></a>
+                                    <a class="btn btn-warning" href="{% url 'update-cart' f.id %}?name=decrease_cart">
+                                        <i class="fa-solid fa-minus"></i>
+                                    </a>
                                 {% endif %}
-                                <h5 class="card-title mx-1">{{item.1}}</h5>
-                                <a class="btn btn-primary" href="{% url 'update-cart' f.id %}?name=increase_cart"><i class="fa-solid fa-plus"></i></a>
-								<a class="btn btn-danger position-absolute end-0 mx-2" href="{% url 'update-cart' f.id %}?name=delete_cart_item"><i class="fa-solid fa-trash"></i></a>
+                                <span class="card-title">{{ item.1 }}</span>
+                                <a class="btn btn-primary" href="{% url 'update-cart' f.id %}?name=increase_cart">
+                                    <i class="fa-solid fa-plus"></i>
+                                </a>
                             </div>
-                        {% endif %}
-                        {% if f.name == item.0 and item.1 == '0' %}
-                            <a href="{% url 'update-cart' f.id %}" class="btn btn-success"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+
+                            <!-- "View Cart" button shown only when item is in the cart -->
+                            <a href="{% url 'cart' %}" class="btn btn-info w-100">
+                                <i class="fa-solid fa-shopping-cart"></i> View Cart
+                            </a>
+
+                            {% endwith %}
                         {% endif %}
                     {% endfor %}
-                    {% if request.user.is_anonymous %}
-                        <a href="{% url 'update-cart' f.id %}" class="btn btn-success">Cart</a>
+                    
+                    {% if not in_cart %}
+                        <!-- "Add to Cart" and "Buy Now" buttons if not in the cart -->
+                        <div class="button-group">
+                            <a href="{% url 'update-cart' f.id %}" class="btn btn-success">
+                                <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                            </a>
+                            <a href="{% url 'buy-now' f.id %}" class="btn btn-primary">
+                                <i class="fa-solid fa-credit-card"></i> Buy Now
+                            </a>
+                        </div>
                     {% endif %}
-                </div>
+                {% endwith %}
             </div>
-        {% endfor %}
-    </div>
+        </div>
+    {% endfor %}
+</div>
 {% endblock maincontent %}

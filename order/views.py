@@ -5,12 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from canteen.models import FoodItem
 from .models import Cart, Orders, OrderItems
-from .forms import LoginRegisterForm
-import random
 from canteen.forms import FoodItemForm
 from canteen.models import FoodItem
 from django.contrib.auth.models import Group
-from .models import Orders
+import random
 
 # Create your views here.
 def index(request):
@@ -266,3 +264,21 @@ def list_orders(request):
 
     # Pass the list of orders to the template
     return render(request, 'order/list_orders.html', {'orders': orders})
+
+def buy_now(request, food_id):
+    food_item = get_object_or_404(FoodItem, id=food_id)
+
+    # Check if the item is already in the cart
+    cart_item, created = Cart.objects.get_or_create(
+        username=request.user,
+        food=food_item,
+        defaults={'quantity': 1}  # If new, set quantity to 1
+    )
+    
+    if not created:
+        # If it already exists, update the quantity to 1
+        cart_item.quantity = 1
+        cart_item.save()
+
+    # Redirect to the cart page for review or checkout
+    return redirect('cart')

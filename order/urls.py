@@ -16,4 +16,6 @@ urlpatterns = [
     path('canteenside/', views.canteenside, name='canteenside'),
     path('update_order_status/<int:order_id>/', views.update_order_status, name='update_order_status'),
     path('orders/', views.list_orders, name='list_orders'),
+    path('buy-now/<int:food_id>/', views.buy_now, name='buy-now'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

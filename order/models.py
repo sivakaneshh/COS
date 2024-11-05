@@ -58,4 +58,3 @@ class OrderItems(models.Model):
     price = models.IntegerField()
     quantity = models.PositiveIntegerField()
     item_total = models.IntegerField()
-

@@ -3,142 +3,200 @@
 {% block maincontent %}
 
 <style>
-    body {
-        background-color: #f8f9fa; /* Light background for better contrast */
+body {
+    background-color: #f8f9fa; /* Light background for better contrast */
+    margin: 0;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+h1.alert {
+    font-weight: normal; /* Normalize alert header weight */
+}
+
+.table {
+    border-radius: 10px; /* Rounded table corners */
+    overflow: hidden; /* Prevent border-radius from being overridden */
+    width: 100%; /* Ensure the table takes full width */
+}
+
+.table-responsive {
+    overflow-x: auto; /* Add horizontal scrolling for small screens */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #e9ecef; /* Light gray background for striped effect */
+}
+
+.modal-header {
+    background-color: #007bff; /* Primary color for header */
+    color: white; /* White text for contrast */
+}
+
+.modal-footer {
+    background-color: #f1f1f1; /* Light footer background */
+}
+
+.progress-bar {
+    transition: width 0.6s ease; /* Smooth progress bar transition */
+}
+
+.btn-outline-primary {
+    transition: background-color 0.3s, color 0.3s; /* Button hover effect */
+}
+
+.btn-outline-primary:hover {
+    background-color: #007bff; /* Primary color on hover */
+    color: white; /* White text on hover */
+}
+
+.fw-bold {
+    font-weight: 700; /* Make bold text more pronounced */
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .table thead {
+        display: none; /* Hide table headers */
     }
-    h1.alert {
-        font-weight: normal; /* Normalize alert header weight */
+
+    .table tr {
+        display: block; /* Make each row a block element */
+        margin-bottom: 1rem; /* Add space between rows */
+        border: 1px solid #ddd; /* Add border for better definition */
+        border-radius: 8px; /* Rounded corners */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for separation */
     }
-    .table {
-        border-radius: 10px; /* Rounded table corners */
-        overflow: hidden; /* Prevent border-radius from being overridden */
+
+    .table td {
+        display: flex; /* Display table cells as flex for better alignment */
+        justify-content: space-between; /* Space out content */
+        padding: 0.75rem; /* Add more padding for readability */
+        border: none; /* Remove default borders */
+        border-bottom: 1px solid #dee2e6; /* Add a bottom border for cell separation */
+        background-color: #ffffff; /* White background for contrast */
+        font-size: 1rem; /* Larger font size */
     }
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: #e9ecef; /* Light gray background for striped effect */
+
+    .table td::before {
+        content: attr(data-label); /* Use data-label to show the column header */
+        font-weight: bold;
+        color: #6c757d; /* Subtle color for the label */
+        flex-basis: 45%; /* Slightly smaller basis for better text fit */
+        padding-right: 1rem; /* Space between label and value */
     }
-    .modal-header {
-        background-color: #007bff; /* Primary color for header */
-        color: white; /* White text for contrast */
+
+    .table td:last-child {
+        border-bottom: none; /* Remove the last cell's border */
     }
-    .modal-footer {
-        background-color: #f1f1f1; /* Light footer background */
+
+    .btn {
+        font-size: 0.9rem; /* Adjust button font size */
+        padding: 0.5rem 1rem; /* Adjust padding */
     }
-    .progress-bar {
-        transition: width 0.6s ease; /* Smooth progress bar transition */
-    }
-    .btn-outline-primary {
-        transition: background-color 0.3s, color 0.3s; /* Button hover effect */
-    }
-    .btn-outline-primary:hover {
-        background-color: #007bff; /* Primary color on hover */
-        color: white; /* White text on hover */
-    }
-    .fw-bold {
-        font-weight: 700; /* Make bold text more pronounced */
-    }
-    @media (max-width: 576px) {
-        .modal-dialog {
-            margin: 1rem; /* Adjust modal margin for small screens */
-        }
-    }
+}
 </style>
 
 <div class="container mt-5">
     {% if orders %}
-    <table class="table table-striped text-center table-bordered">
-      <thead>
-        <tr>
-          <th scope="col">Order Id</th>
-          <th scope="col">Order Date</th>
-          <th scope="col">Amount Paid</th>
-          <th scope="col">Payment Mode</th>
-          <th scope="col">Order Status</th>
-          <th scope="col">Order Details</th>
-        </tr>
-      </thead>
-      <tbody class="table-group-divider">
-          {% for order in orders %}
-        <tr>
-          <th scope="row">#{{order.id}}</th>
-          <td>{{order.order_datetime}}</td>
-          <td>{{order.total_amount}}</td>
-          <td>{{order.payment_mode}}</td>
-          <td>
-            {{order.status}}
-            <div class="progress">
-                {% if order.status == "Pending" %}
-                    <div class="progress-bar bg-secondary progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                {% elif order.status == "Accepted" %}
-                    <div class="progress-bar bg-info progress-bar-striped" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                {% elif order.status == "Cooking" %}
-                    <div class="progress-bar bg-primary progress-bar-striped" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                {% elif order.status == "Packed" %}
-                    <div class="progress-bar bg-warning progress-bar-striped" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>    
-                {% elif order.status == "Completed" %}
-                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                {% endif %}
-            </div>
-          </td>
-          <td>
-            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderNumber{{order.id}}">
-              View details
-            </button>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    {% for order in orders %}
-    <div class="modal fade" id="orderNumber{{order.id}}" tabindex="-1" aria-labelledby="orderDetailsLabel{{order.id}}" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="orderDetailsLabel{{order.id}}">Order Details for Order Id: #{{order.id}}</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-              <p class="m-0"><span class="fw-bold">Ordered On:</span> {{order.order_datetime}}</p>
-              <p class="m-0"><span class="fw-bold">Amount Paid:</span> {{order.total_amount}}</p>
-              <p class="m-0"><span class="fw-bold">Transaction Id:</span> {{order.transaction_id}}</p>
-              <p class="m-0"><span class="fw-bold">Payment Mode:</span> {{order.payment_mode}}</p>
-              <p class="m-0"><span class="fw-bold">Payment Gateway:</span> {{order.payment_gateway}}</p>
-              <p class="m-0"><span class="fw-bold">Order Status:</span> {{order.status}}</p>
-              <hr>
-              <h3>Your Order</h3>
-              <table class="table table-striped text-center table-bordered">
-                <thead>
-                  <tr>
-                    <th scope="col">Food</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Amount</th>
-                  </tr>
-                </thead>
-                <tbody class="table-group-divider">
-                {% for item in order_items %}
-                    {% if item.order.id == order.id %}
-                          <tr>
-                            <th scope="row">{{item.name}}</th>
-                            <td>{{item.price}}</td>
-                            <td>{{item.quantity}}</td>
-                            <td>{{item.item_total}}</td>
-                          </tr>
-                    {% endif %}
+    <div class="table-responsive">
+        <table class="table table-striped text-center table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Order Id</th>
+                    <th scope="col">Order Date</th>
+                    <th scope="col">Amount Paid</th>
+                    <th scope="col">Payment Mode</th>
+                    <th scope="col">Order Status</th>
+                    <th scope="col">Order Details</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for order in orders %}
+                <tr>
+                    <td data-label="Order Id">#{{ order.id }}</td>
+                    <td data-label="Order Date">{{ order.order_datetime }}</td>
+                    <td data-label="Amount Paid">{{ order.total_amount }}</td>
+                    <td data-label="Payment Mode">{{ order.payment_mode }}</td>
+                    <td data-label="Order Status">
+                        {{ order.status }}
+                        <div class="progress mt-2">
+                            {% if order.status == "Pending" %}
+                            <div class="progress-bar bg-secondary progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                            {% elif order.status == "Accepted" %}
+                            <div class="progress-bar bg-info progress-bar-striped" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                            {% elif order.status == "Cooking" %}
+                            <div class="progress-bar bg-primary progress-bar-striped" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                            {% elif order.status == "Packed" %}
+                            <div class="progress-bar bg-warning progress-bar-striped" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                            {% elif order.status == "Completed" %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td data-label="Order Details">
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderNumber{{ order.id }}">
+                            View details
+                        </button>
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
-            </table>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
+        </table>
+    </div>
+
+    {% for order in orders %}
+    <div class="modal fade" id="orderNumber{{ order.id }}" tabindex="-1" aria-labelledby="orderDetailsLabel{{ order.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="orderDetailsLabel{{ order.id }}">Order Details for Order Id: #{{ order.id }}</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="m-0"><span class="fw-bold">Ordered On:</span> {{ order.order_datetime }}</p>
+                    <p class="m-0"><span class="fw-bold">Amount Paid:</span> {{ order.total_amount }}</p>
+                    <p class="m-0"><span class="fw-bold">Transaction Id:</span> {{ order.transaction_id }}</p>
+                    <p class="m-0"><span class="fw-bold">Payment Mode:</span> {{ order.payment_mode }}</p>
+                    <p class="m-0"><span class="fw-bold">Payment Gateway:</span> {{ order.payment_gateway }}</p>
+                    <p class="m-0"><span class="fw-bold">Order Status:</span> {{ order.status }}</p>
+                    <hr>
+                    <h3>Your Order</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped text-center table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Food</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% for item in order_items %}
+                                {% if item.order.id == order.id %}
+                                <tr>
+                                    <td data-label="Food">{{ item.name }}</td>
+                                    <td data-label="Price">{{ item.price }}</td>
+                                    <td data-label="Quantity">{{ item.quantity }}</td>
+                                    <td data-label="Amount">{{ item.item_total }}</td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
     {% endfor %}
 
     {% else %}
-      <h1 class="alert alert-info text-center mt-5">You Have Not Placed Any Orders Yet</h1>
+    <h1 class="alert alert-info text-center mt-5">You Have Not Placed Any Orders Yet</h1>
     {% endif %}
 </div>
 
@@ -147,6 +205,5 @@
 {% block scripts %}
 <script>
     // Optional: JavaScript enhancements can be added here
-    // For example, handle modal events or additional UI interactions
 </script>
 {% endblock scripts %}

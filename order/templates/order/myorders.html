@@ -3,134 +3,219 @@
 {% block maincontent %}
 
 <style>
+/* Base styles */
 body {
-    background-color: #f8f9fa; /* Light background for better contrast */
+    background-color: #f8f9fa;
     margin: 0;
     padding: 1rem;
     box-sizing: border-box;
 }
 
-h1.alert {
-    font-weight: normal; /* Normalize alert header weight */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 15px;
 }
 
+/* Table styles */
 .table {
-    border-radius: 10px; /* Rounded table corners */
-    overflow: hidden; /* Prevent border-radius from being overridden */
-    width: 100%; /* Ensure the table takes full width */
+    border-radius: 12px;
+    overflow: hidden;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
 }
 
-.table-responsive {
-    overflow-x: auto; /* Add horizontal scrolling for small screens */
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    text-align: center;
+    padding: 1rem;
 }
 
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: #e9ecef; /* Light gray background for striped effect */
+.table td {
+    text-align: center;
+    padding: 1rem;
+    vertical-align: middle;
 }
 
+/* Progress bar styles */
+.progress {
+    height: 0.75rem;
+    border-radius: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* Modal styles */
 .modal-header {
-    background-color: #007bff; /* Primary color for header */
-    color: white; /* White text for contrast */
+    background-color: #007bff;
+    color: white;
+    padding: 1rem 1.5rem;
 }
 
-.modal-footer {
-    background-color: #f1f1f1; /* Light footer background */
+.modal-body {
+    padding: 1.5rem;
 }
 
-.progress-bar {
-    transition: width 0.6s ease; /* Smooth progress bar transition */
+.modal-body p {
+    margin-bottom: 0.75rem !important;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
 }
 
 .btn-outline-primary {
-    transition: background-color 0.3s, color 0.3s; /* Button hover effect */
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
 }
 
-.btn-outline-primary:hover {
-    background-color: #007bff; /* Primary color on hover */
-    color: white; /* White text on hover */
-}
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 10px;
+    }
 
-.fw-bold {
-    font-weight: 700; /* Make bold text more pronounced */
-}
-
-/* Responsive adjustments */
-@media (max-width: 576px) {
+    /* Hide table headers on mobile */
     .table thead {
-        display: none; /* Hide table headers */
+        display: none;
     }
 
-    .table tr {
-        display: block; /* Make each row a block element */
-        margin-bottom: 1rem; /* Add space between rows */
-        border: 1px solid #ddd; /* Add border for better definition */
-        border-radius: 8px; /* Rounded corners */
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for separation */
+    /* Convert table rows to cards */
+    .table tbody tr {
+        display: block;
+        background: white;
+        margin-bottom: 1rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 0.5rem;
     }
 
-    .table td {
-        display: flex; /* Display table cells as flex for better alignment */
-        justify-content: space-between; /* Space out content */
-        padding: 0.75rem; /* Add more padding for readability */
-        border: none; /* Remove default borders */
-        border-bottom: 1px solid #dee2e6; /* Add a bottom border for cell separation */
-        background-color: #ffffff; /* White background for contrast */
-        font-size: 1rem; /* Larger font size */
+    /* Style each cell as a flex container */
+    .table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        border-bottom: 1px solid #eee;
+        text-align: right;
     }
 
+    .table tbody td:last-child {
+        border-bottom: none;
+    }
+
+    /* Add labels before cell content */
     .table td::before {
-        content: attr(data-label); /* Use data-label to show the column header */
-        font-weight: bold;
-        color: #6c757d; /* Subtle color for the label */
-        flex-basis: 45%; /* Slightly smaller basis for better text fit */
-        padding-right: 1rem; /* Space between label and value */
+        content: attr(data-label);
+        font-weight: 600;
+        float: left;
+        text-align: left;
+        padding-right: 1rem;
+        color: #495057;
     }
 
-    .table td:last-child {
-        border-bottom: none; /* Remove the last cell's border */
+    /* Status cell specific styling */
+    td[data-label="Order Status"] {
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .btn {
-        font-size: 0.9rem; /* Adjust button font size */
-        padding: 0.5rem 1rem; /* Adjust padding */
+    td[data-label="Order Status"]::before {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Button cell specific styling */
+    td[data-label="Order Details"] {
+        justify-content: center;
+        padding-top: 1rem;
+    }
+
+    td[data-label="Order Details"]::before {
+        display: none;
+    }
+
+    .btn-outline-primary {
+        width: 100%;
+        padding: 0.75rem;
+    }
+
+    /* Modal mobile optimization */
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .modal-body .table td {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .modal-body p {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .modal-body p span.fw-bold {
+        color: #495057;
+    }
+
+    /* Status indicators */
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
     }
 }
+
+/* Order status colors */
+.status-pending { background-color: #e9ecef; }
+.status-accepted { background-color: #cff4fc; }
+.status-cooking { background-color: #cfe2ff; }
+.status-packed { background-color: #fff3cd; }
+.status-completed { background-color: #d1e7dd; }
 </style>
 
-<div class="container mt-5">
+<div class="container mt-4">
     {% if orders %}
     <div class="table-responsive">
-        <table class="table table-striped text-center table-bordered">
+        <table class="table">
             <thead>
                 <tr>
-                    <th scope="col">Order Id</th>
-                    <th scope="col">Order Date</th>
-                    <th scope="col">Amount Paid</th>
-                    <th scope="col">Payment Mode</th>
-                    <th scope="col">Order Status</th>
-                    <th scope="col">Order Details</th>
+                    <th>Order Id</th>
+                    <th>Order Date</th>
+                    <th>Amount Paid</th>
+                    <th>Payment Mode</th>
+                    <th>Order Status</th>
+                    <th>Order Details</th>
                 </tr>
             </thead>
-            <tbody class="table-group-divider">
+            <tbody>
                 {% for order in orders %}
                 <tr>
-                    <td data-label="Order Id">#{{ order.id }}</td>
+                    <td data-label="Order Id" class="fw-bold">#{{ order.id }}</td>
                     <td data-label="Order Date">{{ order.order_datetime }}</td>
-                    <td data-label="Amount Paid">{{ order.total_amount }}</td>
+                    <td data-label="Amount Paid">₹{{ order.total_amount }}</td>
                     <td data-label="Payment Mode">{{ order.payment_mode }}</td>
                     <td data-label="Order Status">
-                        {{ order.status }}
-                        <div class="progress mt-2">
+                        <span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span>
+                        <div class="progress">
                             {% if order.status == "Pending" %}
-                            <div class="progress-bar bg-secondary progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-secondary progress-bar-striped progress-bar-animated" style="width: 100%"></div>
                             {% elif order.status == "Accepted" %}
-                            <div class="progress-bar bg-info progress-bar-striped" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-info progress-bar-striped" style="width: 25%"></div>
                             {% elif order.status == "Cooking" %}
-                            <div class="progress-bar bg-primary progress-bar-striped" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-primary progress-bar-striped" style="width: 50%"></div>
                             {% elif order.status == "Packed" %}
-                            <div class="progress-bar bg-warning progress-bar-striped" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-warning progress-bar-striped" style="width: 75%"></div>
                             {% elif order.status == "Completed" %}
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-success" style="width: 100%"></div>
                             {% endif %}
                         </div>
                     </td>
@@ -147,39 +232,43 @@ h1.alert {
 
     {% for order in orders %}
     <div class="modal fade" id="orderNumber{{ order.id }}" tabindex="-1" aria-labelledby="orderDetailsLabel{{ order.id }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="orderDetailsLabel{{ order.id }}">Order Details for Order Id: #{{ order.id }}</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h1 class="modal-title fs-5" id="orderDetailsLabel{{ order.id }}">Order #{{ order.id }} Details</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="m-0"><span class="fw-bold">Ordered On:</span> {{ order.order_datetime }}</p>
-                    <p class="m-0"><span class="fw-bold">Amount Paid:</span> {{ order.total_amount }}</p>
-                    <p class="m-0"><span class="fw-bold">Transaction Id:</span> {{ order.transaction_id }}</p>
-                    <p class="m-0"><span class="fw-bold">Payment Mode:</span> {{ order.payment_mode }}</p>
-                    <p class="m-0"><span class="fw-bold">Payment Gateway:</span> {{ order.payment_gateway }}</p>
-                    <p class="m-0"><span class="fw-bold">Order Status:</span> {{ order.status }}</p>
+                    <div class="order-details">
+                        <p><span class="fw-bold">Ordered On:</span> {{ order.order_datetime }}</p>
+                        <p><span class="fw-bold">Amount Paid:</span> ₹{{ order.total_amount }}</p>
+                        <p><span class="fw-bold">Transaction Id:</span> {{ order.transaction_id }}</p>
+                        <p><span class="fw-bold">Payment Mode:</span> {{ order.payment_mode }}</p>
+                        <p><span class="fw-bold">Payment Gateway:</span> {{ order.payment_gateway }}</p>
+                        <p><span class="fw-bold">Order Status:</span> 
+                            <span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span>
+                        </p>
+                    </div>
                     <hr>
-                    <h3>Your Order</h3>
+                    <h3 class="text-center mb-3">Order Items</h3>
                     <div class="table-responsive">
-                        <table class="table table-striped text-center table-bordered">
+                        <table class="table">
                             <thead>
                                 <tr>
-                                    <th scope="col">Food</th>
-                                    <th scope="col">Price</th>
-                                    <th scope="col">Quantity</th>
-                                    <th scope="col">Amount</th>
+                                    <th>Item</th>
+                                    <th>Price</th>
+                                    <th>Qty</th>
+                                    <th>Total</th>
                                 </tr>
                             </thead>
-                            <tbody class="table-group-divider">
+                            <tbody>
                                 {% for item in order_items %}
                                 {% if item.order.id == order.id %}
                                 <tr>
-                                    <td data-label="Food">{{ item.name }}</td>
-                                    <td data-label="Price">{{ item.price }}</td>
-                                    <td data-label="Quantity">{{ item.quantity }}</td>
-                                    <td data-label="Amount">{{ item.item_total }}</td>
+                                    <td data-label="Item" class="fw-bold">{{ item.name }}</td>
+                                    <td data-label="Price">₹{{ item.price }}</td>
+                                    <td data-label="Qty">{{ item.quantity }}</td>
+                                    <td data-label="Total">₹{{ item.item_total }}</td>
                                 </tr>
                                 {% endif %}
                                 {% endfor %}
@@ -196,14 +285,10 @@ h1.alert {
     {% endfor %}
 
     {% else %}
-    <h1 class="alert alert-info text-center mt-5">You Have Not Placed Any Orders Yet</h1>
+    <div class="alert alert-info text-center mt-5">
+        <h4 class="mb-0">You Have Not Placed Any Orders Yet</h4>
+    </div>
     {% endif %}
 </div>
 
 {% endblock maincontent %}
-
-{% block scripts %}
-<script>
-    // Optional: JavaScript enhancements can be added here
-</script>
-{% endblock scripts %}

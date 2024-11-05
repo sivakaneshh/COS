@@ -10,6 +10,7 @@ import random
 from canteen.forms import FoodItemForm
 from canteen.models import FoodItem
 from django.contrib.auth.models import Group
+from .models import Orders
 
 # Create your views here.
 def index(request):
@@ -232,11 +233,6 @@ def update_order_status(request, order_id):
             return redirect('update_order_status', order_id=order_id)
 
     
-
-    # Render the form with the current order's details
-    #return render(request, 'update_order_status.html', {'order': order})
-    
-
     return render(request, 'order/update_status.html', {'order': order, 'order_id': order.id})
 
 @login_required(login_url='/login/')

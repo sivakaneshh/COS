@@ -80,19 +80,20 @@
 <body>
     <div class="container">
         <h2><a href="{% url 'canteenside' %}">Available Orders</a></h2>
-
+    
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th>Order ID</th>
+                    <th>Customer Name</th>
                     <th>Status</th>
-                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for order in orders %}
                 <tr>
                     <td>{{ order.id }}</td>
+                    <td>{{ order.username }}</td> <!-- Display customer name here -->
                     <td>
                         <!-- Dropdown for updating order status -->
                         <form method="post" class="d-inline">
@@ -110,11 +111,6 @@
                             </select>
                         </form>
                     </td>
-                    <td>
-                        <!-- Disable Update Status button if order is completed -->
-                        <a href="#" class="btn btn-secondary btn-sm 
-                            {% if order.status == 'Completed' %} disabled {% endif %}">Update Status</a>
-                    </td>
                 </tr>
                 {% empty %}
                 <tr>
@@ -124,6 +120,7 @@
             </tbody>
         </table>
     </div>
+    
 
     <!-- Bootstrap JS (optional, if you need any Bootstrap features like modals, dropdowns, etc.) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

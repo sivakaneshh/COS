@@ -65,8 +65,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'cos-db',
-        "HOST": "localhost",
-        "PORT": "5500",
+        "HOST": "db",
+        "PORT": "3306",
         "USER": "user",
         "PASSWORD": "cos-pass"
     }

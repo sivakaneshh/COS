@@ -1,182 +1,177 @@
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect,redirect,get_object_or_404, redirect
-from django.contrib.auth.models import User
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.models import User, Group
+from django.http import JsonResponse
+from django.db import transaction
+import random
+
 from canteen.models import FoodItem
 from .models import Cart, Orders, OrderItems
 from .forms import LoginRegisterForm
-import random
 from canteen.forms import FoodItemForm
-from canteen.models import FoodItem
-from django.contrib.auth.models import Group
-from django.http import JsonResponse
+
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
 
 
-# Create your views here.
 def index(request):
-    food = FoodItem.objects.all()
-    name_quantity_of_all_food = []
-    if(request.user.is_authenticated):
-        cartitems = Cart.objects.filter(username=request.user)
-        for f in food:
-            find = False
-            name_quantity_combo = []
-            for item in cartitems:
-                if(f.name == item.food.name):
-                    name_quantity_combo.append(f.name)
-                    name_quantity_combo.append(item.quantity)
-                    find = True
+    food_items = FoodItem.objects.all()
+    cart_summary = []
+
+    if request.user.is_authenticated:
+        cart_items = Cart.objects.filter(username=request.user)
+        for food in food_items:
+            quantity = 0
+            for item in cart_items:
+                if food.name == item.food.name:
+                    quantity = item.quantity
                     break
-            if(not find):
-                name_quantity_combo.append(f.name)
-                name_quantity_combo.append('0')
-            name_quantity_of_all_food.append(name_quantity_combo)
-    return render(request, 'order/index.html', {'food':food, 'cartitems':name_quantity_of_all_food})
+            cart_summary.append({'name': food.name, 'quantity': quantity})
+
+    return render(request, 'order/index.html', {'food': food_items, 'cartitems': cart_summary})
+
 
 def register(request):
-    if(request.method == 'GET'):
+    if request.method == 'GET':
         form = LoginRegisterForm()
-        return render(request, 'order/register.html', {'form':form})
-    elif(request.method == 'POST'):
+        return render(request, 'order/register.html', {'form': form})
+    
+    elif request.method == 'POST':
         form = LoginRegisterForm(request.POST)
-        un = request.POST.get('username')
-        pw = request.POST.get('password')
-        if(User.objects.filter(username=un).exists()):
-            messages.warning(request, 'User Already Exists, try other unique username')
-            return HttpResponseRedirect('/register/')
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+
+            if User.objects.filter(username=username).exists():
+                messages.warning(request, 'User already exists. Try another unique username.')
+                return redirect('register')
+
+            new_user = User(username=username)
+            new_user.set_password(password)
+            new_user.save()
+            messages.success(request, 'Account created successfully. You can now log in.')
+            return redirect('login')
         else:
-            if(form.is_valid()):
-                un = form.cleaned_data['username']
-                pw = form.cleaned_data['password']
-                new_user = User(username=un)
-                new_user.set_password(pw)
-                new_user.save()
-                messages.success(request, 'Account Created Successfully, You can Login Now')
-                return HttpResponseRedirect('/login/')
+            messages.error(request, 'Invalid form submission. Please try again.')
+            return redirect('register')
+
 
 def user_login(request):
-    if(request.method == 'GET'):
+    if request.method == 'GET':
         form = LoginRegisterForm()
-        return render(request, 'order/login.html', {'form':form})
-    elif(request.method == 'POST'):
+        return render(request, 'order/login.html', {'form': form})
+
+    elif request.method == 'POST':
         form = LoginRegisterForm(request.POST)
-        un = request.POST.get('username')
-        pw = request.POST.get('password')
-        if(not User.objects.filter(username=un).exists()):
-            messages.warning(request, 'User Does Not Exist or Wrong Password, Try Again')
-            return HttpResponseRedirect('/login/')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect('index')
         else:
-            auth_user = authenticate(username=un, password=pw)
-            if(auth_user):
-                login(request, auth_user)
-                return HttpResponseRedirect('/')
-            else:
-                messages.warning(request, 'User Does Not Exist or Wrong Password, Try Again')
-                return HttpResponseRedirect('/login/')
+            messages.warning(request, 'Invalid username or password. Please try again.')
+            return redirect('login')
 
-@login_required(login_url='/login/')
+
+@login_required(login_url='login')
 def update_cart(request, f_id):
-    food = FoodItem.objects.get(id=f_id)
-    if(Cart.objects.filter(username = request.user, food=food).exists()):
-        old_quantity = Cart.objects.values_list('quantity', flat=True).get(username=request.user, food=food)
-        if(request.GET.get('name') == 'increase_cart'):
-            updated_quantity = old_quantity + 1
-            Cart.objects.filter(username = request.user, food=food).update(quantity = updated_quantity)
-        elif(request.GET.get('name') == 'decrease_cart'):
-            updated_quantity = old_quantity - 1
-            Cart.objects.filter(username = request.user, food=food).update(quantity = updated_quantity)
-        elif(request.GET.get('name') == 'delete_cart_item'):
-            item_to_delete = Cart.objects.get(username=request.user, food=food)
-            item_to_delete.delete()
-    else:
-        cart_item = Cart(username = request.user, food=food)
+    food = get_object_or_404(FoodItem, id=f_id)
+    action = request.GET.get('name')
+    cart_item, created = Cart.objects.get_or_create(username=request.user, food=food, defaults={'quantity': 0})
+
+    if action == 'increase_cart':
+        cart_item.quantity += 1
+    elif action == 'decrease_cart' and cart_item.quantity > 0:
+        cart_item.quantity -= 1
+    elif action == 'delete_cart_item':
+        cart_item.delete()
+        return redirect('cart')
+
+    if cart_item.quantity > 0:
         cart_item.save()
-
-    if('cart' in request.META['HTTP_REFERER']):
-        return HttpResponseRedirect('/cart/')
     else:
-        return HttpResponseRedirect('/')
+        cart_item.delete()
 
-@login_required(login_url='/login/')
+    return redirect('cart' if 'cart' in request.META['HTTP_REFERER'] else 'index')
+
+
+@login_required(login_url='login')
 def cart(request):
-    cartitems = Cart.objects.filter(username=request.user)
-    total_amount = 0
-    if(cartitems):
-        for item in cartitems:
-            sub_total = item.food.price * item.quantity
-            total_amount += sub_total
-    return render(request, 'order/cart.html', {'cartitems':cartitems, 'total_amount':total_amount})
+    cart_items = Cart.objects.filter(username=request.user)
+    total_amount = sum(item.food.price * item.quantity for item in cart_items)
+    return render(request, 'order/cart.html', {'cartitems': cart_items, 'total_amount': total_amount})
 
-@login_required(login_url='/login/')
+
+@transaction.atomic
 def checkout(request):
     if request.method == 'POST':
-        # Determine payment details
-        if request.POST.get('paymode') == 'Cash':
-            tn_id = 'CASH' + str(random.randint(111111111111111, 999999999999999))
-            payment_mode = "Cash"
-            payment_gateway = "Cash"
-        elif request.POST.get('paymode') == 'Online' and request.POST.get('paygate') == "Paypal":
-            tn_id = request.POST.get('tn_id')
-            payment_mode = "Online"
-            payment_gateway = "Paypal"
-        else:
-            return HttpResponse('<H1>Invalid Request</H1>')
-        
-        # Get cart items and create a new order
-        cartitems = Cart.objects.filter(username=request.user)
+        payment_mode = request.POST.get('paymode')
+        payment_gateway = request.POST.get('paygate', 'Cash')
+        tn_id = request.POST.get('tn_id', f'CASH{random.randint(111111111111111, 999999999999999)}')
+
+        if payment_mode not in ['Cash', 'Online'] or (payment_mode == 'Online' and payment_gateway != 'Paypal'):
+            return HttpResponse('<h1>Invalid Request</h1>')
+
+        cart_items = Cart.objects.filter(username=request.user)
+        if not cart_items.exists():
+            messages.error(request, 'Your cart is empty.')
+            return redirect('cart')
+
+        new_order = Orders.objects.create(
+            username=request.user,
+            total_amount=0,
+            payment_mode=payment_mode,
+            transaction_id=tn_id,
+            payment_gateway=payment_gateway
+        )
+
         total_amount = 0
-        new_order = Orders(username=request.user, total_amount=total_amount, payment_mode=payment_mode, transaction_id=tn_id, payment_gateway=payment_gateway)
-        new_order.save()  # Save the new order to get the `order_id`
+        for item in cart_items:
+            if item.food.stock_quantity < item.quantity:
+                messages.error(request, f'Not enough stock for {item.food.name}.')
+                return redirect('cart')
 
-        # Add items to the order
-        if cartitems:
-            for item in cartitems:
-                OrderItems(
-                    username=request.user,
-                    order=new_order,
-                    name=item.food.name,
-                    price=item.food.price,
-                    quantity=item.quantity,
-                    item_total=item.food.price * item.quantity
-                ).save()
+            item.food.stock_quantity -= item.quantity
+            item.food.save()
 
-                sub_total = item.food.price * item.quantity
-                total_amount += sub_total
+            OrderItems.objects.create(
+                username=request.user,
+                order=new_order,
+                name=item.food.name,
+                price=item.food.price,
+                quantity=item.quantity,
+                item_total=item.food.price * item.quantity
+            )
 
-            # Update the total amount of the order
-            new_order.total_amount = total_amount
-            new_order.save()
+            total_amount += item.food.price * item.quantity
 
-        # Clear the cart after checkout
-        cartitems.delete()
+        new_order.total_amount = total_amount
+        new_order.save()
+        cart_items.delete()
 
-        # Redirect to 'my orders' page with the new `order_id`
         messages.success(request, f'Order placed successfully! Your Order ID is {new_order.id}.')
-        return HttpResponseRedirect('/myorders/')
-    else:
-        return HttpResponse('<H1>Invalid Request</H1>')
+        return redirect('/myorders/')
 
-@login_required(login_url='/login/')
+    return HttpResponse('<h1>Invalid Request</h1>')
+
+
+@login_required(login_url='login')
 def my_orders(request):
-    orders = Orders.objects.filter(username = request.user).order_by("-order_datetime", "id")
-    order_items = OrderItems.objects.filter(username = request.user)
-    return render(request, 'order/myorders.html', {'orders':orders, 'order_items':order_items})
+    orders = Orders.objects.filter(username=request.user).order_by("-order_datetime", "id")
+    order_items = OrderItems.objects.filter(username=request.user)
+    return render(request, 'order/myorders.html', {'orders': orders, 'order_items': order_items})
+
 
 def user_logout(request):
     logout(request)
-    messages.success(request, 'Logout Successfully')
-    return HttpResponseRedirect('/')
+    messages.success(request, 'Logged out successfully.')
+    return redirect('index')
 
-
-
-
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import FoodItem
-from .forms import FoodItemForm
 
 @login_required(login_url='/login/')
 def add_food(request):
@@ -199,7 +194,7 @@ def add_food(request):
                 messages.success(request, 'Food item added successfully!')
                 return redirect('add_food')  # Redirect back after adding
 
-        # Handle updating stock
+        #Handle updating stock
         elif request.method == 'POST' and 'update_stock' in request.POST:
             food_id = request.POST.get('food_id')
             new_stock = request.POST.get('new_stock')
@@ -232,17 +227,14 @@ def add_food(request):
         return redirect('/')
 
 
-
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def canteenside(request):
-    # Check if the user belongs to the "canteen" group
     if request.user.groups.filter(name='canteen').exists():
         return render(request, 'order/canteenside.html')
-    else:
-        # If not in the "canteen" group, show a permission denied message or redirect
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('/')
-    
+
+    messages.error(request, 'You do not have permission to access this page.')
+    return redirect('index')
+
 
 def update_order_status(request, order_id):
     order = get_object_or_404(Orders, id=order_id)
@@ -250,71 +242,109 @@ def update_order_status(request, order_id):
     if request.method == 'POST':
         new_status = request.POST.get('status')
 
-        # Validate the new status against the choices defined in the model
-        if new_status in dict(Orders.STATUS_CHOICES):  # Use the top-level STATUS_CHOICES
+        if new_status in dict(Orders.STATUS_CHOICES):
             order.status = new_status
             order.save()
-            messages.success(request, f"Order {order_id} status updated successfully!")
+            messages.success(request, f'Order {order_id} status updated successfully.')
             return redirect('canteenside')
-        else:
-            messages.error(request, "Invalid status selected.")
-            return redirect('update_order_status', order_id=order_id)
 
-    
-    return render(request, 'order/update_status.html', {'order': order, 'order_id': order.id})
+        messages.error(request, 'Invalid status selected.')
+        return redirect('update_order_status', order_id=order_id)
 
-@login_required(login_url='/login/')
+    return render(request, 'order/update_status.html', {'order': order})
+
+
+@login_required(login_url='login')
 def list_orders(request):
     if request.method == 'POST':
-        # Handling the form submission to update the order status
-        order_id = request.POST.get('order_id')  # Get the order ID from the form
-        new_status = request.POST.get('status')  # Get the new status from the form
+        order_id = request.POST.get('order_id')
+        new_status = request.POST.get('status')
 
         try:
-            # Fetch the order object by its ID
             order = Orders.objects.get(id=order_id)
-            # Update the order status
             order.status = new_status
-            order.save()  # Save the updated status to the database
-
-            # Show success message after updating
-            messages.success(request, f"Order {order_id} status updated successfully.")
+            order.save()
+            messages.success(request, f'Order {order_id} status updated successfully.')
         except Orders.DoesNotExist:
-            # Handle case where order is not found
-            messages.error(request, "Order not found.")
-        
-        # Redirect back to the same page to avoid re-posting the form
+            messages.error(request, 'Order not found.')
+
         return redirect('list_orders')
 
-    # Fetch all orders to display in the template
     orders = Orders.objects.all()
-
-    # Debugging line to print orders in the console
-    print(f"Retrieved orders: {orders}")
-
-    # Pass the list of orders to the template
     return render(request, 'order/list_orders.html', {'orders': orders})
+
 
 def buy_now(request, food_id):
     food_item = get_object_or_404(FoodItem, id=food_id)
 
-    # Check if the item is already in the cart
     cart_item, created = Cart.objects.get_or_create(
         username=request.user,
         food=food_item,
-        defaults={'quantity': 1}  # If new, set quantity to 1
+        defaults={'quantity': 1}
     )
-    
     if not created:
-        # If it already exists, update the quantity to 1
         cart_item.quantity = 1
         cart_item.save()
 
-    # Redirect to the cart page for review or checkout
     return redirect('cart')
+
 
 def clear_completed_orders(request):
     if request.method == 'DELETE':
         Orders.objects.filter(status='Completed').delete()
         return JsonResponse({'message': 'Completed orders cleared successfully.'}, status=200)
+
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
+def order_details(request, order_id):
+    order = get_object_or_404(Orders, id=order_id)
+    order_items = OrderItems.objects.filter(order=order)
+    
+    # Build data to send back as JSON
+    data = {
+        'order_id': order.id,
+        'total_amount': order.total_amount,
+        'payment_mode': order.payment_mode,
+        'items': [
+            {
+                'name': item.name,
+                'price': item.price,
+                'quantity': item.quantity,
+            }
+            for item in order_items
+        ]
+    }
+    
+    return JsonResponse(data)
+
+def send_invoice_email(order):
+    
+    subject = f"Invoice for Order {order.id}"
+    recipient = order.email if order.email else order.username.email  
+    
+    context = {
+        'order': order,
+        'order_items': OrderItems.objects.filter(order=order),  
+    }
+
+    message = render_to_string('order/order_invoice.html', context)  
+    
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [recipient],
+        html_message=message, 
+    )
+
+def update_order_status(order_id, new_status):
+    try:
+        order = Orders.objects.get(id=order_id)
+        order.status = new_status
+        order.save()
+
+        
+        if new_status == "Completed":
+            send_invoice_email(order)
+    except Orders.DoesNotExist:
+        print(f"Order with ID {order_id} does not exist.")

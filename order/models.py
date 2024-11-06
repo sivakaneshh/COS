@@ -47,6 +47,8 @@ class Orders(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Pending")
     transaction_id = models.CharField(max_length=100)
     payment_gateway = models.CharField(max_length=50)
+    email = models.EmailField(max_length=255, blank=True, null=True)
+
 
     def __str__(self):
         return f"Order {self.id} by {self.username.username} - Status: {self.status}"

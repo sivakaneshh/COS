@@ -3,101 +3,232 @@
 
 {% block maincontent %}
 <style>
-    /* Custom styling for the forms */
-    .card {
-        border-radius: 8px;
+    .register-card {
+        background: white;
+        border-radius: 15px;
         border: none;
-    }
-    
-    .card-header {
-        border-radius: 8px 8px 0 0;
-    }
-    
-    .card-body {
-        padding: 20px;
-    }
-    
-    input[type="text"], input[type="password"], input[type="email"] {
-        border-radius: 4px;
-        border: 1px solid #ced4da;
-        padding: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
         width: 100%;
-        font-size: 1rem;
+        max-width: 400px;
     }
-    
-    .btn-primary {
-        background-color: #007bff;
-        border: none;
-        padding: 10px;
-        font-size: 1rem;
-        border-radius: 5px;
+
+    .register-card:hover {
+        transform: translateY(-5px);
     }
-    
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
-    
-    .invalid-feedback {
-        display: none;
-        font-size: 0.875rem;
-        color: #dc3545;
-    }
-    
-    /* Success/Alert Message styling */
-    .alert {
+
+    .register-header {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 1.75rem;
         margin-bottom: 1.5rem;
     }
-    
-    .alert-dismissible .btn-close {
-        background: transparent;
+
+    .register-subtext {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-floating {
+        margin-bottom: 1rem;
+        position: relative; /* For positioning the toggle button */
+    }
+
+    .form-floating input {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 1rem 0.75rem;
+        height: 3.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-floating input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.25rem rgba(0,123,255,0.1);
+    }
+
+    .form-floating label {
+        padding: 1rem 0.75rem;
+    }
+
+    .btn-register {
+        background-color: #007bff;
         border: none;
+        padding: 0.8rem;
+        font-size: 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        width: 100%;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
     }
-    
-    /* Responsive design adjustments */
-    @media (max-width: 576px) {
-        .card-body {
-            padding: 15px;
-        }
+
+    .btn-register:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,123,255,0.2);
     }
-    </style>
-    
 
+    .alert {
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
 
-<div class="container d-flex justify-content-center align-items-center min-vh-100">
-    <div class="card shadow-lg p-4" style="width: 100%; max-width: 400px;">
-        <h1 class="text-center mb-4">Register</h1>
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
 
-        <form action="" method="post" class="needs-validation" novalidate>
-            {% csrf_token %}
-            <div class="mb-3">
-                {{ form.username.label_tag }}
-                {{ form.username }}  <!-- Use your form fields directly -->
-            </div>
-            <div class="mb-3">
-                {{ form.password.label_tag }}
-                {{ form.password }}  <!-- Use your form fields directly -->
-            </div>
-            <div class="mb-3">
-                {{ form.email.label_tag }}
-                {{ form.email }}  <!-- Use your form fields directly -->
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Register</button>
-        </form>
+    .alert-dismissible .btn-close {
+        padding: 1.25rem; 
+    }
 
-        <div class="text-center mt-3">
-            <p>Already have an account? <a href="{% url 'login' %}" class="text-decoration-none">Login here</a></p>
-        </div>
-    </div>
+    .alternative-actions {
+        margin-top: 1.5rem; 
+        text-align: center; 
+        color: #6c757d; 
+    }
+
+    .alternative-actions a {
+        color: #007bff; 
+        text-decoration: none; 
+        transition: color 0.3s ease; 
+    }
+
+    .alternative-actions a:hover {
+       color:#0056b3; 
+       text-decoration : underline; 
+   }
+
+   .form-invalid {
+       border-color : #dc3545 !important; 
+   }
+
+   .invalid-feedback {
+       display : block; 
+       font-size : 0.875rem; 
+       color : #dc3545; 
+       margin-top : 0.25rem; 
+   }
+
+   @media (max-width :576px) {
+       .register-card {
+           margin :1rem; 
+           padding-left :10px; 
+           padding-right :10px; 
+           padding-top :20px; 
+           padding-bottom :20px; 
+           /* Adjust padding for mobile */
+       }
+       
+       .register-header {
+           font-size :1.5rem; 
+       }
+   }
+</style>
+
+<div class="register-container d-flex justify-content-center align-items-center p-3">
+    <div class="register-card p-4">
+        
+      <div class="text-center mb-4">
+          <h1 class="register-header">Create an Account</h1>
+          <p class="register-subtext">Please fill in the details to register</p>
+      </div>
+
+      {% if messages %}
+          {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+          {% endfor %}
+      {% endif %}
+
+      <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+          
+          <div class="form-floating">
+              {{ form.username }}
+              <label for="{{ form.username.id_for_label }}">Username</label>
+              {% if form.username.errors %}
+                  <div class="invalid-feedback">
+                      {{ form.username.errors|join:", " }}
+                  </div>
+              {% endif %}
+          </div>
+
+          <div class="form-floating">
+              {{ form.password }}
+              <label for="{{ form.password.id_for_label }}">Password</label>
+              {% if form.password.errors %}
+                  <div class="invalid-feedback">
+                      {{ form.password.errors|join:", " }}
+                  </div>
+              {% endif %}
+              <!-- Toggle Password Visibility -->
+              <button type="button" id="togglePassword" class="btn btn-outline-secondary position-absolute end-0 top-50 translate-middle-y me-2">
+                  <i class="fas fa-eye"></i>
+              </button>
+          </div>
+
+          <button type="submit" class="btn btn-register">
+              Sign Up
+          </button>
+
+          <div class="alternative-actions">
+              <p class="mb-0">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+          </div>
+      </form>
+   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+   // Add Bootstrap classes to form inputs
+   const formInputs = document.querySelectorAll('input[type="text"], input[type="password"], input[type="email"]');
+   formInputs.forEach(input => {
+       input.classList.add('form-control');
+       if (input.required) {
+           input.setAttribute('required', '');
+       }
+   });
+
+   // Form validation
+   const form = document.querySelector('form');
+   form.addEventListener('submit', function(event) {
+       if (!form.checkValidity()) {
+           event.preventDefault();
+           event.stopPropagation();
+       }
+       form.classList.add('was-validated');
+   });
+
+   // Show/hide password functionality
+   const passwordInput = document.querySelector('input[type="password"]');
+   const togglePasswordButton = document.getElementById('togglePassword');
+
+   togglePasswordButton.addEventListener('click', function() {
+       // Toggle the type attribute
+       const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+       passwordInput.setAttribute('type', type);
+       
+       // Toggle the eye icon
+       this.innerHTML = `<i class="fas fa-eye${type === 'password' ? '' : '-slash'}"></i>`;
+   });
+});
+</script>
+
 {% endblock maincontent %}

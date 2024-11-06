@@ -4,155 +4,199 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Management</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
-        /* Custom Styles */
-        body {
-            font-family: 'Arial', sans-serif; /* Font for the entire page */
-            background-color: #f4f7f8; /* Light background color */
-            color: #333; /* Dark text color */
-            margin: 0;
-            padding: 20px;
-        }
-
-        h2 {
-            color: #5a5a5a; /* Subtle heading color */
-            text-align: center; /* Center the heading */
-            margin-bottom: 20px; /* Spacing below the heading */
-        }
-
-        /* Table Styles */
-        table {
-            width: 100%; /* Full width */
-            border-collapse: collapse; /* Remove double borders */
-            margin: 0 auto; /* Center the table */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            border-radius: 8px; /* Rounded corners */
-            overflow: hidden; /* Hide overflow */
-        }
-
-        thead {
-            background-color: #007bff; /* Bootstrap primary color */
-            color: white; /* White text for the header */
-        }
-
-        th, td {
-            padding: 12px 15px; /* Padding for table cells */
-            text-align: left; /* Align text to the left */
-            border-bottom: 1px solid #dddddd; /* Light bottom border */
-        }
-
-        tr:hover {
-            background-color: #f1f1f1; /* Highlight row on hover */
-        }
-
-        tbody tr:nth-child(even) {
-            background-color: #f9f9f9; /* Zebra stripe effect for even rows */
-        }
-
-        tbody tr td a {
-            color: #007bff; /* Link color */
-            text-decoration: none; /* Remove underline */
-            padding: 8px 12px; /* Padding for links */
-            border-radius: 4px; /* Rounded corners for links */
-            transition: background-color 0.3s; /* Smooth transition for background */
-        }
-
-        tbody tr td a:hover {
-            background-color: #e2e6ea; /* Light grey background on hover */
-            color: #0056b3; /* Darker blue color on hover */
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 600px) {
-            th, td {
-                padding: 8px; /* Reduce padding on smaller screens */
+        @media (max-width: 640px) {
+            .order-grid {
+                grid-template-columns: 1fr;
             }
+        }
 
-            h2 {
-                font-size: 1.5em; /* Adjust heading size */
-            }
+        .status-select {
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        }
+
+        .order-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .order-details.expanded {
+            max-height: 500px;
+            transition: max-height 0.5s ease-in;
         }
     </style>
 </head>
-<div class="d-flex justify-content-between mb-3">
-    <h2><a href="{% url 'canteenside' %}">Available Orders</a></h2>
-    <button class="btn btn-danger btn-sm clear-orders">Clear Completed Orders</button>
-</div>
+<body class="bg-gray-50 min-h-screen p-4 md:p-6">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header Section -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+            <h2 class="text-2xl font-bold text-gray-800">
+                <a href="{% url 'canteenside' %}" class="hover:text-blue-600 transition-colors">
+                    Available Orders
+                </a>
+            </h2>
+            <button class="clear-orders bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors shadow-sm">
+                Clear Completed Orders
+            </button>
+        </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Customer Name</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for order in orders %}
-        <tr data-order-id="{{ order.id }}">
-            <td>{{ order.id }}</td>
-            <td>{{ order.username }}</td>
-            <td>
-                <!-- Dropdown for updating order status -->
-                <form method="post" class="d-inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="order_id" value="{{ order.id }}">
-                    <select name="status" class="form-control form-control-sm" 
-                            {% if order.status == 'Completed' %} disabled {% endif %} 
-                            onchange="this.form.submit()">
-                        {% for status_value, status_label in order.STATUS_CHOICES %}
-                            <option value="{{ status_value }}" 
-                                {% if order.status == status_value %} selected {% endif %}>
-                                {{ status_label }}
-                            </option>
+        <!-- Orders List -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-blue-500 text-white">
+                        <tr>
+                            <th class="px-4 py-3 text-left">Order ID</th>
+                            <th class="px-4 py-3 text-left">Customer Name</th>
+                            <th class="px-4 py-3 text-left">Status</th>
+                            <th class="px-4 py-3 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for order in orders %}
+                        <tr class="hover:bg-gray-50 transition-colors" data-order-id="{{ order.id }}">
+                            <td class="px-4 py-3">{{ order.id }}</td>
+                            <td class="px-4 py-3">{{ order.username }}</td>
+                            <td class="px-4 py-3">
+                                <form method="post" class="inline-block w-full max-w-xs">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                                    <select name="status" 
+                                            class="status-select w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 {% if order.status == 'Completed' %}bg-gray-100{% endif %}"
+                                            {% if order.status == 'Completed' %}disabled{% endif %}
+                                            onchange="this.form.submit()">
+                                        {% for status_value, status_label in order.STATUS_CHOICES %}
+                                            <option value="{{ status_value }}"
+                                                {% if order.status == status_value %}selected{% endif %}>
+                                                {{ status_label }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            </td>
+                            <td class="px-4 py-3">
+                                <button onclick="toggleOrderDetails({{ order.id }})"
+                                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-colors shadow-sm">
+                                    View Details
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="bg-gray-50" id="order-details-{{ order.id }}" style="display: none;">
+                            <td colspan="4" class="px-4 py-3">
+                                <div id="details-content-{{ order.id }}" class="text-sm space-y-2">
+                                    Loading details...
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                No orders available.
+                            </td>
+                        </tr>
                         {% endfor %}
-                    </select>
-                </form>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="3">No orders available.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-<!-- Add this JavaScript code to handle the "Clear Completed Orders" button -->
-<script>
-    document.querySelector('.clear-orders').addEventListener('click', () => {
-        if (confirm('Are you sure you want to clear all completed orders?')) {
-            clearCompletedOrders();
-        }
-    });
-
-    function clearCompletedOrders() {
-        // Make an AJAX request to the server to clear completed orders
-        fetch('/clear-completed-orders/', {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                // Remove all rows with the "Completed" status
-                document.querySelectorAll('tr[data-order-id]').forEach(row => {
-                    if (row.querySelector('select').value === 'Completed') {
-                        row.remove();
-                    }
-                });
-                console.log('Completed orders cleared successfully.');
+    <script>
+        function toggleOrderDetails(orderId) {
+            const detailsRow = document.getElementById(`order-details-${orderId}`);
+            const detailsContent = document.getElementById(`details-content-${orderId}`);
+            
+            if (detailsRow.style.display === "none") {
+                detailsRow.style.display = "table-row";
+                
+                fetch(`/orders/details/${orderId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const detailsHtml = `
+                            <div class="bg-white p-4 rounded-lg shadow-sm space-y-3">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <span class="font-medium text-gray-700">Order ID:</span>
+                                        <span class="ml-2 text-gray-600">${data.order_id}</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-700">Amount Paid:</span>
+                                        <span class="ml-2 text-gray-600">₹${data.total_amount}</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-700">Payment Mode:</span>
+                                        <span class="ml-2 text-gray-600">${data.payment_mode}</span>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <span class="font-medium text-gray-700">Items:</span>
+                                    <ul class="mt-2 space-y-1">
+                                        ${data.items.map(item => `
+                                            <li class="flex justify-between items-center bg-gray-50 p-2 rounded">
+                                                <span>${item.name}</span>
+                                                <span class="text-gray-600">₹${item.price} x ${item.quantity}</span>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                        detailsContent.innerHTML = detailsHtml;
+                    })
+                    .catch(error => {
+                        detailsContent.innerHTML = `
+                            <div class="text-red-500 p-4">
+                                Failed to load details. Please try again.
+                            </div>
+                        `;
+                        console.error("Error fetching order details:", error);
+                    });
             } else {
-                console.error('Error clearing completed orders.');
+                detailsRow.style.display = "none";
             }
-        })
-        .catch(error => {
-            console.error('Error clearing completed orders:', error);
+        }
+
+        document.querySelector('.clear-orders').addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all completed orders?')) {
+                clearCompletedOrders();
+            }
         });
-    }
-</script>
+
+        function clearCompletedOrders() {
+            fetch('/clear-completed-orders/', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.querySelectorAll('tr[data-order-id]').forEach(row => {
+                        if (row.querySelector('select').value === 'Completed') {
+                            row.remove();
+                            const detailsRow = document.getElementById(`order-details-${row.dataset.orderId}`);
+                            if (detailsRow) detailsRow.remove();
+                        }
+                    });
+                    console.log('Completed orders cleared successfully.');
+                } else {
+                    console.error('Error clearing completed orders.');
+                }
+            })
+            .catch(error => {
+                console.error('Error clearing completed orders:', error);
+            });
+        }
+    </script>
+</body>
+</html>

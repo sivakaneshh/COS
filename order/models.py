@@ -29,9 +29,6 @@ class Orders(models.Model):
     # Status choices defined within the Orders model
     STATUS_CHOICES = (
         ("Pending", "Pending"),
-        ("Accepted", "Accepted"),
-        ("Cooking", "Cooking"),
-        ("Packed", "Packed"),
         ("Completed", "Completed"),
     )
 
@@ -60,3 +57,10 @@ class OrderItems(models.Model):
     price = models.IntegerField()
     quantity = models.PositiveIntegerField()
     item_total = models.IntegerField()
+
+class RFID(models.Model):
+    roll_number = models.CharField(max_length=20, unique=True)  # Unique Roll Number of the user
+    rfid_tag = models.CharField(max_length=50, unique=True)     # Unique RFID Tag
+
+    def __str__(self):
+        return f"{self.roll_number} - {self.rfid_tag}"

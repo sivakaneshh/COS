@@ -8,3 +8,4 @@ gunicorn
 celery
 celery[redis]==5.2.7  
 redis==4.3.4          
+openpyxl

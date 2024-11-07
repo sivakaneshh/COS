@@ -2,11 +2,16 @@ from django.contrib.auth.models import User
 from django import forms
 from canteen.models import FoodItem
 from .models import *
-class LoginRegisterForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
-    class Meta:
-        model = User
-        fields = ('username', 'password')
+class LoginRegisterForm(forms.Form):
+    username = forms.CharField(label='Roll Number', max_length=20)
+    password = forms.CharField(label='Password', widget=forms.PasswordInput)
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if RFID.objects.filter(roll_number=username).exists():
+            return username
+        else:
+            raise forms.ValidationError('Invalid roll number. Please enter a valid roll number.')
 
 class FoodItemForm(forms.ModelForm):
     class Meta:

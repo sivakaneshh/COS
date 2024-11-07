@@ -19,5 +19,5 @@ urlpatterns = [
     path('buy-now/<int:food_id>/', views.buy_now, name='buy-now'),
     path('clear-completed-orders/', views.clear_completed_orders, name='clear_completed_orders'),
     path('orders/details/<int:order_id>/', views.order_details, name='order-details'),
-
+    path('punch', views.rfid_punch_view, name='punch'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

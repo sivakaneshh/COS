@@ -231,10 +231,12 @@
                     
                     {% if f.stock_quantity > 0 %}
                         <div class="button-container">
-                            <a href="{% url 'update-cart' f.id %}" class="btn btn-cart">
+                            <!-- Add to Cart with the increase action -->
+                            <a href="{% url 'update-cart' f.id %}?name=increase_cart" class="btn btn-cart">
                                 <i class="fa-solid fa-cart-shopping"></i>
                                 Add to Cart
                             </a>
+                            <!-- Buy Now button -->
                             <a href="{% url 'buy-now' f.id %}" class="btn btn-buy">
                                 <i class="fa-solid fa-credit-card"></i>
                                 Buy Now

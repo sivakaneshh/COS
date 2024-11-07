@@ -6,15 +6,16 @@ from django.contrib.auth.models import User, Group
 from django.http import JsonResponse
 from django.db import transaction
 import random
-
+from django.views import View
 from canteen.models import FoodItem
-from .models import Cart, Orders, OrderItems
+from .models import Cart, Orders, OrderItems,RFID
 from .forms import LoginRegisterForm
 from canteen.forms import FoodItemForm
 
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
+from django.utils.decorators import method_decorator
 
 
 def index(request):
@@ -42,16 +43,13 @@ def register(request):
     elif request.method == 'POST':
         form = LoginRegisterForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
+            roll_number = form.cleaned_data['username']
             password = form.cleaned_data['password']
 
-            if User.objects.filter(username=username).exists():
-                messages.warning(request, 'User already exists. Try another unique username.')
-                return redirect('register')
-
-            new_user = User(username=username)
-            new_user.set_password(password)
+            rfid_obj = RFID.objects.get(roll_number=roll_number)
+            new_user = User.objects.create_user(username=rfid_obj.roll_number, password=password)
             new_user.save()
+
             messages.success(request, 'Account created successfully. You can now log in.')
             return redirect('login')
         else:
@@ -80,25 +78,36 @@ def user_login(request):
 
 @login_required(login_url='login')
 def update_cart(request, f_id):
+    # Get the food item or return 404 if it doesn't exist
     food = get_object_or_404(FoodItem, id=f_id)
-    action = request.GET.get('name')
-    cart_item, created = Cart.objects.get_or_create(username=request.user, food=food, defaults={'quantity': 0})
+    
+    # Check if a cart item exists for this user and food item
+    cart_item, created = Cart.objects.get_or_create(username=request.user, food=food, defaults={'quantity': 1})
+    
+    # If the cart item was newly created, we can skip the update actions
+    if not created:
+        # Retrieve the requested action
+        action = request.GET.get('name')
+        
+        if action == 'increase_cart':
+            cart_item.quantity += 1  # Increase quantity
+            cart_item.save()
+        
+        elif action == 'decrease_cart':
+            if cart_item.quantity > 1:
+                cart_item.quantity -= 1  # Decrease quantity but ensure it's not below 1
+                cart_item.save()
+            else:
+                cart_item.delete()  # If quantity is 1, delete the item to remove it from cart
+        
+        elif action == 'delete_cart_item':
+            cart_item.delete()  # Remove the item from the cart
 
-    if action == 'increase_cart':
-        cart_item.quantity += 1
-    elif action == 'decrease_cart' and cart_item.quantity > 0:
-        cart_item.quantity -= 1
-    elif action == 'delete_cart_item':
-        cart_item.delete()
-        return redirect('cart')
-
-    if cart_item.quantity > 0:
-        cart_item.save()
+    # Redirect based on the referrer
+    if 'cart' in request.META.get('HTTP_REFERER', ''):
+        return HttpResponseRedirect('/cart/')
     else:
-        cart_item.delete()
-
-    return redirect('cart' if 'cart' in request.META['HTTP_REFERER'] else 'index')
-
+        return HttpResponseRedirect('/')
 
 @login_required(login_url='login')
 def cart(request):
@@ -289,13 +298,6 @@ def buy_now(request, food_id):
     return redirect('cart')
 
 
-def clear_completed_orders(request):
-    if request.method == 'DELETE':
-        Orders.objects.filter(status='Completed').delete()
-        return JsonResponse({'message': 'Completed orders cleared successfully.'}, status=200)
-
-    return JsonResponse({'error': 'Invalid request method.'}, status=400)
-
 def order_details(request, order_id):
     order = get_object_or_404(Orders, id=order_id)
     order_items = OrderItems.objects.filter(order=order)
@@ -317,34 +319,95 @@ def order_details(request, order_id):
     
     return JsonResponse(data)
 
-def send_invoice_email(order):
-    
-    subject = f"Invoice for Order {order.id}"
-    recipient = order.email if order.email else order.username.email  
-    
-    context = {
-        'order': order,
-        'order_items': OrderItems.objects.filter(order=order),  
-    }
+def clear_completed_orders(request):
+    if request.method == 'DELETE':
+        Orders.objects.filter(status='Completed').delete()
+        return JsonResponse({'message': 'Completed orders cleared successfully.'}, status=200)
 
-    message = render_to_string('order/order_invoice.html', context)  
-    
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [recipient],
-        html_message=message, 
-    )
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
-def update_order_status(order_id, new_status):
-    try:
-        order = Orders.objects.get(id=order_id)
-        order.status = new_status
-        order.save()
+@login_required(login_url='/login/')
+def list_orders(request):
+    if request.method == 'POST':
+        if 'rfid_tag' in request.POST:
+            rfid_tag = request.POST.get('rfid_tag')
+            try:
+                rfid_obj = RFID.objects.get(rfid_tag=rfid_tag)
+                user = User.objects.get(username=rfid_obj.roll_number)
 
-        
-        if new_status == "Completed":
-            send_invoice_email(order)
-    except Orders.DoesNotExist:
-        print(f"Order with ID {order_id} does not exist.")
+                # Check if the user has any pending orders
+                pending_orders = Orders.objects.filter(username=user, status='Pending')
+                if pending_orders.exists():
+                    for order in pending_orders:
+                        order.status = 'Completed'
+                        order.save()
+
+                        # Send the invoice email
+                        #send_invoice_email(order)
+
+                    messages.success(request, 'Orders marked as completed.')
+                else:
+                    messages.info(request, 'No pending orders found.')
+
+                return redirect('list_orders')
+            except (RFID.DoesNotExist, User.DoesNotExist):
+                messages.error(request, 'Invalid RFID tag.')
+                return redirect('list_orders')
+        else:
+            order_id = request.POST.get('order_id')
+            new_status = request.POST.get('status')
+
+            try:
+                order = Orders.objects.get(id=order_id)
+                order.status = new_status
+                order.save()
+                messages.success(request, f'Order {order_id} status updated successfully.')
+            except Orders.DoesNotExist:
+                messages.error(request, 'Order not found.')
+
+            return redirect('list_orders')
+
+    orders = Orders.objects.all()
+    return render(request, 'order/list_orders.html', {'orders': orders})
+
+@login_required(login_url='/login/')
+def rfid_punch_view(request):
+    if request.method == 'POST':
+        # Check if RFID form was submitted
+        if 'rfid_tag' in request.POST:
+            rfid_tag = request.POST.get('rfid_tag')
+            try:
+                rfid_obj = RFID.objects.get(rfid_tag=rfid_tag)
+                user = User.objects.get(username=rfid_obj.roll_number)
+
+                # Check for any pending orders for the user
+                pending_orders = Orders.objects.filter(username=user, status='Pending')
+                if pending_orders.exists():
+                    for order in pending_orders:
+                        order.status = 'Completed'
+                        order.save()
+                    messages.success(request, 'Orders marked as completed.')
+                else:
+                    messages.info(request, 'No pending orders found for this user.')
+
+            except (RFID.DoesNotExist, User.DoesNotExist):
+                messages.error(request, 'Invalid RFID tag.')
+            return redirect('punch')
+
+        # Check if individual order status update form was submitted
+        elif 'order_id' in request.POST:
+            order_id = request.POST.get('order_id')
+            new_status = request.POST.get('status')
+
+            try:
+                order = Orders.objects.get(id=order_id)
+                order.status = new_status
+                order.save()
+                messages.success(request, f'Order {order_id} status updated successfully.')
+            except Orders.DoesNotExist:
+                messages.error(request, 'Order not found.')
+            return redirect('punch')
+
+    # GET request: Render the order list template
+    orders = Orders.objects.all()
+    return render(request, 'order/list_orders.html', {'orders': orders})

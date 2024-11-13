@@ -6,86 +6,89 @@
     <title>Order Management</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
+        /* Custom styling for mobile view */
         @media (max-width: 640px) {
             .order-grid {
                 grid-template-columns: 1fr;
             }
         }
         .status-select {
+            padding-right: 2.5rem;
+            appearance: none;
             background-position: right 0.5rem center;
             background-repeat: no-repeat;
             background-size: 1.5em 1.5em;
-            padding-right: 2.5rem;
-            appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen p-4 md:p-6">
-    <div class="max-w-6xl mx-auto">
+<body class="bg-gray-50 min-h-screen p-6 md:p-8">
 
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-            <h2 class="text-2xl font-bold text-gray-800">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header and Clear Orders Button -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-6">
+            <h2 class="text-3xl font-bold text-gray-800">
                 <a href="{% url 'canteenside' %}" class="hover:text-blue-600 transition-colors">Available Orders</a>
             </h2>
-            <button onclick="clearCompletedOrders()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors shadow-sm">Clear Completed Orders</button>
+            <button onclick="window.location.href='{% url 'completed_orders' %}'" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors shadow-md">Completed Orders</button>
         </div>
-        
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+
+        <!-- RFID Punch Section -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-6">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">Available Orders</h1>
+                <h1 class="text-3xl font-semibold text-gray-800">Available Orders</h1>
             </div>
             <div class="flex items-center">
-                <h2 class="text-2xl font-bold text-gray-800 mr-4">RFID Punch</h2>
-                <form method="post" action="{% url 'punch' %}" class="flex items-center">
+                <h2 class="text-2xl font-semibold text-gray-800 mr-6">RFID Punch</h2>
+                <form method="post" action="{% url 'punch' %}" class="flex items-center space-x-4">
                     {% csrf_token %}
-                    {% if request.student_rfidnum %}
-                    <input type="text" name="rfid_tag" placeholder="Enter RFID Tag" class="border border-gray-300 rounded-lg px-4 py-2 mr-2" required>{{ request }}
-                    {% else %}
-                    <input type="text" name="rfid_tag" placeholder="Enter RFID Tag" class="border border-gray-300 rounded-lg px-4 py-2 mr-2" required>
-                    {% endif %}
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Punch In</button>
+                    <input type="text" name="rfid_tag" placeholder="Enter RFID Tag" class="border border-gray-300 rounded-lg px-6 py-3 text-lg focus:outline-none" required>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">Punch In</button>
                 </form>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Orders Table Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Pending Orders -->
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <h3 class="text-xl font-semibold bg-blue-500 text-white p-4">Pending Orders</h3>
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <h3 class="text-xl font-semibold bg-blue-500 text-white p-6">Pending Orders</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-200 text-gray-600">
+                    <table class="w-full text-gray-800">
+                        <thead class="bg-gray-200">
                             <tr>
-                                <th class="px-4 py-3 text-left">Order ID</th>
-                                <th class="px-4 py-3 text-left">Customer Name</th>
-                                <th class="px-4 py-3 text-left">Status</th>
-                                <th class="px-4 py-3 text-left">Actions</th>
+                                <th class="px-6 py-4 text-left">Order ID</th>
+                                <th class="px-6 py-4 text-left">Customer Name</th>
+                                <th class="px-6 py-4 text-left">Total Amount</th>
+                                <th class="px-6 py-4 text-left">Status</th>
+                                <th class="px-6 py-4 text-left">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             {% for order in orders %}
-                                {% if order.status != 'Completed' %}
+                                {% if order.status == 'Pending' %}
                                     <tr class="hover:bg-gray-50 transition-colors" data-order-id="{{ order.id }}">
-                                        <td class="px-4 py-3">{{ order.id }}</td>
-                                        <td class="px-4 py-3">{{ order.rfid_name }}</td>
-                                        <td class="px-4 py-3">
+                                        <td class="px-6 py-4">{{ order.id }}</td>
+                                        <td class="px-6 py-4">{{ order.rfid_name }}</td>
+                                        <td class="px-6 py-4">₹{{ order.total_amount }}</td>
+                                        <td class="px-6 py-4">
                                             <form method="post" class="inline-block w-full max-w-xs">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="order_id" value="{{ order.id }}">
-                                                <select name="status" class="status-select w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="this.form.submit()">
+                                                <select name="status" class="status-select w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="this.form.submit()">
                                                     {% for status_value, status_label in order.STATUS_CHOICES %}
                                                         <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>{{ status_label }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </form>
                                         </td>
-                                        <td class="px-4 py-3">
-                                            <button onclick="toggleOrderDetails({{ order.id }})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-colors shadow-sm">View Details</button>
+                                        <td class="px-6 py-4">
+                                            <button onclick="toggleOrderDetails({{ order.id }})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg text-sm transition-colors shadow-sm">View Details</button>
                                         </td>
                                     </tr>
+                                    <!-- Order Details Row -->
                                     <tr class="bg-gray-50" id="order-details-{{ order.id }}" style="display: none;">
-                                        <td colspan="4" class="px-4 py-3">
+                                        <td colspan="5" class="px-6 py-3">
                                             <div id="details-content-{{ order.id }}" class="text-sm space-y-2">Loading details...</div>
                                         </td>
                                     </tr>
@@ -96,36 +99,45 @@
                 </div>
             </div>
 
-            <!-- Completed Orders -->
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <h3 class="text-xl font-semibold bg-green-500 text-white p-4">Completed Orders</h3>
+            <!-- Ready Orders -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <h3 class="text-xl font-semibold bg-green-500 text-white p-6">Ready Orders</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-200 text-gray-600">
+                    <table class="w-full text-gray-800">
+                        <thead class="bg-gray-200">
                             <tr>
-                                <th class="px-4 py-3 text-left">Order ID</th>
-                                <th class="px-4 py-3 text-left">Customer Name</th>
-                                <th class="px-4 py-3 text-left">Status</th>
-                                <th class="px-4 py-3 text-left">Actions</th>
+                                <th class="px-6 py-4 text-left">Order ID</th>
+                                <th class="px-6 py-4 text-left">Customer Name</th>
+                                <th class="px-6 py-4 text-left">Total Amount</th>
+                                <th class="px-6 py-4 text-left">Status</th>
+                                <th class="px-6 py-4 text-left">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200" id="completed-orders">
+                        <tbody class="divide-y divide-gray-200">
                             {% for order in orders %}
-                                {% if order.status == 'Completed' %}
+                                {% if order.status == 'Packed' %}
                                     <tr class="hover:bg-gray-50 transition-colors" data-order-id="{{ order.id }}">
-                                        <td class="px-4 py-3">{{ order.id }}</td>
-                                        <td class="px-4 py-3">{{ order.rfid_name }}</td>
-                                        <td class="px-4 py-3">
-                                            <select class="status-select w-full px-3 py-2 border rounded-lg text-sm bg-gray-100" disabled>
-                                                <option selected>Completed</option>
-                                            </select>
+                                        <td class="px-6 py-4">{{ order.id }}</td>
+                                        <td class="px-6 py-4">{{ order.rfid_name }}</td>
+                                        <td class="px-6 py-4">₹{{ order.total_amount }}</td>
+                                        <td class="px-6 py-4">
+                                            <form method="post" class="inline-block w-full max-w-xs">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                                <select name="status" class="status-select w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="this.form.submit()">
+                                                    {% for status_value, status_label in order.STATUS_CHOICES %}
+                                                        <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>{{ status_label }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </form>
                                         </td>
-                                        <td class="px-4 py-3">
-                                            <button onclick="toggleOrderDetails({{ order.id }})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-colors shadow-sm">View Details</button>
+                                        <td class="px-6 py-4">
+                                            <button onclick="toggleOrderDetails({{ order.id }})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg text-sm transition-colors shadow-sm">View Details</button>
                                         </td>
                                     </tr>
+                                    <!-- Order Details Row -->
                                     <tr class="bg-gray-50" id="order-details-{{ order.id }}" style="display: none;">
-                                        <td colspan="4" class="px-4 py-3">
+                                        <td colspan="5" class="px-6 py-3">
                                             <div id="details-content-{{ order.id }}" class="text-sm space-y-2">Loading details...</div>
                                         </td>
                                     </tr>
@@ -133,18 +145,33 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    
                 </div>
             </div>
-          
         </div>
-        <footer class="bg-white py-4 border-top">
-            <div class="container text-center">
-                <p class="text-muted mb-0">© IPS-Tech. All rights reserved.</p>
-            </div>
-        </footer>
-    </div>
 
+        <!-- Food Item Summary Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mt-8">
+            <h3 class="text-xl font-semibold bg-yellow-500 text-white p-6">Food Item Summary</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-gray-800">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-6 py-4 text-left">Food Item</th>
+                            <th class="px-6 py-4 text-left">Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for food_item in food_items%}
+                            <tr>
+                                <td class="px-6 py-4">{{ food_item.name }}</td>
+                                <td class="px-6 py-4">{{ food_item.stock_quantity }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <script>
         function toggleOrderDetails(orderId) {
@@ -160,52 +187,23 @@
                         const detailsHtml = `
                             <div class="bg-white p-4 rounded-lg shadow-sm space-y-3">
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <span class="font-medium text-gray-700">Order ID:</span>
-                                        <span class="ml-2 text-gray-600">${data.order_id}</span>
-                                    </div>
-                                    <div>
-                                        <span class="font-medium text-gray-700">Amount Paid:</span>
-                                        <span class="ml-2 text-gray-600">₹${data.total_amount}</span>
-                                    </div>
-                                    <div>
-                                        <span class="font-medium text-gray-700">Payment Mode:</span>
-                                        <span class="ml-2 text-gray-600">${data.payment_mode}</span>
-                                    </div>
+                                    <div><span class="font-medium text-gray-700">Order ID:</span><span class="ml-2 text-gray-600">${data.order_id}</span></div>
+                                    <div><span class="font-medium text-gray-700">Amount Paid:</span><span class="ml-2 text-gray-600">₹${data.total_amount}</span></div>
+                                    <div><span class="font-medium text-gray-700">Payment Mode:</span><span class="ml-2 text-gray-600">${data.payment_mode}</span></div>
                                 </div>
-                                <div class="mt-4">
-                                    <span class="font-medium text-gray-700">Items:</span>
-                                    <ul class="mt-2 space-y-1">
-                                        ${data.items.map(item => `
-                                            <li class="flex justify-between items-center bg-gray-50 p-2 rounded">
-                                                <span>${item.name}</span>
-                                                <span class="text-gray-600">₹${item.price} x ${item.quantity}</span>
-                                            </li>
-                                        `).join('')}
-                                    </ul>
-                                </div>
+                                <div class="mt-4"><span class="font-medium text-gray-700">Items:</span><ul class="mt-2 space-y-1">${data.items.map(item => `<li class="flex justify-between items-center bg-gray-50 p-2 rounded"><span>${item.name}</span><span class="text-gray-600">₹${item.price} x ${item.quantity}</span></li>`).join('')}</ul></div>
                             </div>
                         `;
                         detailsContent.innerHTML = detailsHtml;
                     })
                     .catch(error => {
-                        detailsContent.innerHTML = `
-                            <div class="text-red-500 p-4">
-                                Failed to load details. Please try again.
-                            </div>
-                        `;
+                        detailsContent.innerHTML = `<div class="text-red-500 p-4">Failed to load details. Please try again.</div>`;
                         console.error("Error fetching order details:", error);
                     });
             } else {
                 detailsRow.style.display = "none";
             }
         }
-
-        document.querySelector('.clear-orders').addEventListener('click', () => {
-            if (confirm('Are you sure you want to clear all completed orders?')) {
-                clearCompletedOrders();
-            }
-        });
 
         function clearCompletedOrders() {
             fetch('/clear-completed-orders/', {

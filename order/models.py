@@ -28,6 +28,7 @@ class Orders(models.Model):
     # Status choices defined within the Orders model
     STATUS_CHOICES = (
         ("Pending", "Pending"),
+        ("Packed", "Packed"),
         ("Completed", "Completed"),
     )
 
@@ -66,3 +67,4 @@ class RFID(models.Model):
 
     def __str__(self):
         return f"{self.roll_number} - {self.name} - {self.rfid_tag}"
+

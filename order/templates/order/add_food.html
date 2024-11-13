@@ -39,6 +39,18 @@
                     {% endif %}
                 </div>
                 {% endfor %}
+
+                <!-- Food Type Dropdown -->
+                <div class="col-md-6">
+                    <label for="food_type" class="form-label">Food Type</label>
+                    <select name="food_type" id="food_type" class="form-select">
+                        <option value="snack">Snacks</option>
+                        <option value="hot_drinks">Hot Drinks</option>
+                        <option value="beverages">Beverages</option>
+                        <option value="lunch">Lunch</option>
+                    </select>
+                </div>
+
                 <div class="col-12">
                     <button type="submit" name="add_food" class="btn btn-primary">
                         <i class="fas fa-plus-circle me-2"></i>Add Food Item
@@ -61,8 +73,8 @@
                         <tr>
                             <th>Image</th>
                             <th>Name</th>
-                            <th>Price</th>
-                            <th>Description</th>
+                            <th>Price(₹)</th>
+                            <th>Food Type</th>
                             <th>Stock</th>
                             <th>Actions</th>
                         </tr>
@@ -77,14 +89,8 @@
                                      style="height: 60px; width: 60px; object-fit: cover;">
                             </td>
                             <td class="fw-semibold">{{ item.name }}</td>
-                            <td>${{ item.price }}</td>
-                            <td>
-                                <div class="text-truncate" style="max-width: 200px;" 
-                                     data-bs-toggle="tooltip" 
-                                     title="{{ item.description }}">
-                                    {{ item.description }}
-                                </div>
-                            </td>
+                            <td>{{ item.price }}</td>
+                            <td>{{ item.food_type|capfirst }}</td>  <!-- Displaying Food Type -->
                             <td>
                                 <span class="badge {% if item.stock_quantity > 10 %}bg-success{% elif item.stock_quantity > 0 %}bg-warning{% else %}bg-danger{% endif %}">
                                     {{ item.stock_quantity }}
@@ -143,6 +149,7 @@
         </div>
     </div>
 </div>
+
 
 <style>
     /* Custom styles for the food management page */

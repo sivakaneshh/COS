@@ -245,24 +245,22 @@ def canteenside(request):
     return redirect('index')
 
 
-def update_order_status(request, order_id):
-    order = get_object_or_404(Orders, id=order_id)
+# def update_order_status(request, order_id):
+#     order = get_object_or_404(Orders, id=order_id)
 
-    if request.method == 'POST':
-        new_status = request.POST.get('status')
+#     if request.method == 'POST':
+#         new_status = request.POST.get('status')
 
-        if new_status in dict(Orders.STATUS_CHOICES):
-            order.status = new_status
-            order.save()
-            messages.success(request, f'Order {order_id} status updated successfully.')
-            return redirect('canteenside')
+#         if new_status in dict(Orders.STATUS_CHOICES):
+#             order.status = new_status
+#             order.save()
+#             messages.success(request, f'Order {order_id} status updated successfully.')
+#             return redirect('canteenside')
 
-        messages.error(request, 'Invalid status selected.')
-        return redirect('update_order_status', order_id=order_id)
+#         messages.error(request, 'Invalid status selected.')
+#         return redirect('update_order_status', order_id=order_id)
 
-    return render(request, 'order/update_status.html', {'order': order})
-
-
+#     return render(request, 'order/update_status.html', {'order': order})
 
 
 @login_required(login_url='login')
@@ -316,6 +314,7 @@ def list_orders(request):
         new_status = request.POST.get('status')
 
         try:
+            # Update the order status
             order = Orders.objects.get(id=order_id)
             order.status = new_status
             order.save()
@@ -337,7 +336,15 @@ def list_orders(request):
         # Set `rfid_name` to the matched RFID name or fallback to the `username` if no match is found
         order.rfid_name = rfid_map.get(user_roll_number, order.username.username)
 
-    return render(request, 'order/list_orders.html', {'orders': orders})
+    # Fetch all available food items (regardless of whether they are ordered or not)
+    food_items = FoodItem.objects.all()
+
+    # Pass orders and food items to the template
+    return render(request, 'order/list_orders.html', {
+        'orders': orders,
+        'food_items': food_items,  # All food items (not just the ordered ones)
+    })
+
 
 
 @login_required(login_url='/login/')
@@ -393,3 +400,14 @@ def rfid_punch_view(request):
         order.rfid_name = rfid_map.get(user_roll_number, order.username.username)
 
     return render(request, 'order/list_orders.html', {'orders': orders})
+
+
+def completed_orders(request):
+    """
+    View to display the completed orders page.
+    """
+    # Fetch all orders with status 'Completed'
+    orders = Orders.objects.filter(status='Completed')
+    
+    # Pass orders to the template
+    return render(request, 'order/completed.html', {'orders': orders})

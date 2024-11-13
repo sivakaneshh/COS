@@ -43,5 +43,5 @@ def load_rfids(csv_path):
                 print(f"Error importing RFID for row {row}: {e}")
 
 if __name__ == "__main__":
-    load_rfids("RFID_withname.csv")  # Ensure this is the correct path to your CSV file
+    load_rfids("C:\sk\kgcos\students.csv")  # Ensure this is the correct path to your CSV file
     print("RFID data import complete!")

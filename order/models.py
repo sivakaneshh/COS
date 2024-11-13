@@ -7,7 +7,6 @@ from canteen.models import FoodItem
 STATUS_CHOICES = (
     ("Pending", "Pending"),
     ("Accepted", "Accepted"),
-    ("Cooking", "Cooking"),
     ("Packed", "Packed"),
     ("Completed", "Completed"),
 )

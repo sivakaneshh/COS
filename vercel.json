@@ -1,6 +1,6 @@
 {
     "builds" : [{
-        "src" : "canteen_ordering_sys/wsgi.py",
+        "src" : "Dockerfile",
         "use" : "@vercel/python",
         "config" : { "maxLambdaSize" : "15mb", "runtime": "python3.12.7"}
     }],
@@ -8,7 +8,7 @@
         {
 
         "src" : "/(.*)",
-        "dest" : "canteen_ordering_sys/wsgi.py"
+        "dest" : "/"
     }
         
         

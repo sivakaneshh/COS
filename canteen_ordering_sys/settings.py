@@ -11,7 +11,7 @@ SECRET_KEY = "django-insecure-2k8svw_k2ylfsr##^cjh9^33m=_v+s%c&&3ge149i&&-spx+-8
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app']
+ALLOWED_HOSTS = ['*']
 
 
 CELERY_BROKER_URL = 'redis://redis:6379/0'
@@ -64,14 +64,13 @@ WSGI_APPLICATION = "canteen_ordering_sys.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'cos-db',
-        "HOST": "db",
-        "PORT": "3306",
-        "USER": "user",
-        "PASSWORD": "cos-pass"
+        'NAME': os.getenv('DATABASE_NAME', 'cos-db'),
+        'USER': os.getenv('DATABASE_USER', 'user'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'cos-pass'),
+        'HOST': os.getenv('DATABASE_HOST', 'localhost'),  # 'db' matches the service name in docker-compose.yml
+        'PORT': os.getenv('DATABASE_PORT', '3306'),
     }
 }
-
 
 
 

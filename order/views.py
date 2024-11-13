@@ -265,7 +265,7 @@ def update_order_status(request, order_id):
 
 
 
-
+@login_required(login_url='login')
 def buy_now(request, food_id):
     food_item = get_object_or_404(FoodItem, id=food_id)
 

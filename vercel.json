@@ -1,16 +1,16 @@
-{
-    "builds" : [{
-        "src" : "Dockerfile",
-        "use" : "@vercel/python",
-        "config" : { "maxLambdaSize" : "15mb", "runtime": "python3.12.7"}
-    }],
-    "routes": [
-        {
+// {
+//     "builds" : [{
+//         "src" : "Dockerfile",
+//         "use" : "@vercel/python",
+//         "config" : { "maxLambdaSize" : "15mb", "runtime": "python3.12.7"}
+//     }],
+//     "routes": [
+//         {
 
-        "src" : "/(.*)",
-        "dest" : "/"
-    }
+//         "src" : "/(.*)",
+//         "dest" : "/"
+//     }
         
         
-    ]
-}
+//     ]
+// }

@@ -11,7 +11,7 @@ SECRET_KEY = "django-insecure-2k8svw_k2ylfsr##^cjh9^33m=_v+s%c&&3ge149i&&-spx+-8
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['.vercel.app']
 
 
 CELERY_BROKER_URL = 'redis://redis:6379/0'
@@ -65,8 +65,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'cos-db',
-        "HOST": "localhost",
-        "PORT": "5500",
+        "HOST": "db",
+        "PORT": "3306",
         "USER": "user",
         "PASSWORD": "cos-pass"
     }

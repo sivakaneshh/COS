@@ -1,20 +1,26 @@
-# Example Dockerfile
-FROM python:3.10
+# Start with a Python base image
+FROM python:3.12-slim
 
-# Install system dependencies
+# Install system dependencies and MySQL client libraries
 RUN apt-get update && apt-get install -y \
-    default-libmysqlclient-dev \
+    libmysqlclient-dev \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy requirements and install dependencies
+COPY requirements.txt /app/
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-# Copy the project files
-COPY . .
+# Copy the Django application code
+COPY . /app
 
-# Command to run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "canteen_ordering_sys.wsgi:application"]
+# Run database migrations and collect static files
+RUN python manage.py migrate
+RUN python manage.py collectstatic --noinput
+
+# Set the default command to run Django using Gunicorn
+CMD ["gunicorn", "canteen_ordering_sys.wsgi:application", "--bind", "0.0.0.0:8000"]

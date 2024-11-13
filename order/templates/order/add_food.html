@@ -90,7 +90,7 @@
                             </td>
                             <td class="fw-semibold">{{ item.name }}</td>
                             <td>{{ item.price }}</td>
-                            <td>{{ item.food_type|capfirst }}</td>  <!-- Displaying Food Type -->
+                            <td>{{ item.food_choice|capfirst }}</td>  <!-- Displaying Food Type -->
                             <td>
                                 <span class="badge {% if item.stock_quantity > 10 %}bg-success{% elif item.stock_quantity > 0 %}bg-warning{% else %}bg-danger{% endif %}">
                                     {{ item.stock_quantity }}

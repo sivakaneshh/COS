@@ -21,7 +21,6 @@
 
         body {
             background-color: var(--bg-color);
-            font-family: 'Arial', sans-serif;
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
@@ -36,16 +35,14 @@
 
         .navbar-brand {
             color: white !important;
-            font-weight: 600;
-            font-size: 1.75rem;
             padding: 0.5rem 0;
+            font-weight:bold;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .nav-link {
             color: white !important;
-            font-weight: 500;
             padding: 0.75rem 1rem !important;
             transition: all 0.3s ease;
             border-radius: 6px;
@@ -203,22 +200,22 @@
     </div>
 
     <nav class="navbar sticky-top navbar-expand-lg">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">KG-BITES</a>
+        <div class="container">
+            <a class="navbar-brand fs-2" href="/">KG-BITES</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/"><i class="fas fa-home me-2"></i>Home</a>
+                        <a class="nav-link fs-5" href="/"><i class="fas fa-home me-2 "></i>Home</a>
                     </li>
                     {% if request.user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'my-orders' %}"><i class="fas fa-list me-2"></i>My Orders</a>
+                            <a class="nav-link fs-5" href="{% url 'my-orders' %}"><i class="fas fa-list me-2"></i>My Orders</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'cart' %}">
+                            <a class="nav-link fs-5" href="{% url 'cart' %}">
                                 <i class="fa-solid fa-cart-shopping me-2"></i>Cart
                                 {% if request.user.get_cart_count > 0 %}
                                     <span class="badge fade-in">{{request.user.get_cart_count}}</span>
@@ -226,10 +223,10 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                            <a class="nav-link fs-5" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
                         </li>
                         <li class="nav-item user-info">
-                            <a class="nav-link" href="{% url 'index' %}">
+                            <a class="nav-link fs-5" href="{% url 'index' %}">
                                 <i class="fa-solid fa-user me-2"></i>{{request.user|title}}
                             </a>
                         </li>

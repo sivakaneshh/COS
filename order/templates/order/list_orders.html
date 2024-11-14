@@ -73,7 +73,7 @@
                             {% for order in orders %}
                                 {% if order.status == 'Pending' %}
                                     <tr class="hover:bg-gray-50 transition-colors" data-order-id="{{ order.id }}">
-                                        <td class="px-6 py-4">{{ order.id }}</td>
+                                        <td class="px-6 py-4">#{{ order.id }}</td>
                                         <td class="px-6 py-4">{{ order.rfid_name }}</td>
                                         <td class="px-6 py-4">₹{{ order.total_amount }}</td>
                                         <td class="px-6 py-4">
@@ -122,7 +122,7 @@
                             {% for order in orders %}
                                 {% if order.status == 'Packed' %}
                                     <tr class="hover:bg-gray-50 transition-colors" data-order-id="{{ order.id }}">
-                                        <td class="px-6 py-4">{{ order.id }}</td>
+                                        <td class="px-6 py-4">#{{ order.id }}</td>
                                         <td class="px-6 py-4">{{ order.rfid_name }}</td>
                                         <td class="px-6 py-4">₹{{ order.total_amount }}</td>
                                         <td class="px-6 py-4">

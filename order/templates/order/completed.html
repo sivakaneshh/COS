@@ -54,7 +54,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200" id="completed-orders">
                         {% for orders in orders %}
-                            {% if order.status == 'Completed' %}
+                            {% if orders.status == 'Completed' %}
                                 <tr class="hover:bg-gray-50 transition-colors" data-order-id="{{ order.id }}">
                                     <td class="px-4 py-3">{{ orders.id }}</td>
                                     <td class="px-4 py-3">{{ orders.rfid_name }}</td>

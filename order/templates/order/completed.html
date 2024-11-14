@@ -1,95 +1,384 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Management</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <meta name="description" content="KG Bites - Order Management System">
+    <title>KG Bites - Order Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <style>
-        /* Custom styling for mobile view */
-        @media (max-width: 640px) {
-            .order-grid {
-                grid-template-columns: 1fr;
-            }
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #dc3545;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            padding: 0.75rem 1rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .navbar-brand {
+            color: white !important;
+            padding: 0.5rem 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            color: white !important;
+            padding: 0.75rem 1rem !important;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+            background-color: white;
+            box-shadow: var(--shadow-md);
+            border-radius: 12px;
+            margin: 1.5rem auto;
+            width: 95%;
+            max-width: 1200px;
+            position: relative;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .btn-clear {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-clear:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .orders-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.25rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            padding: 1rem;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .orders-table th {
+            background-color: var(--bg-color);
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .orders-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .orders-table tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
         }
 
         .status-select {
-            padding-right: 2.5rem;
+            width: 100%;
+            padding: 0.5rem 2rem 0.5rem 1rem;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
             appearance: none;
-            background-position: right 0.5rem center;
+            background-color: white;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23495057' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .status-select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .btn-view {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-view:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .order-details {
+            background-color: var(--bg-color);
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .order-details.active {
+            max-height: 500px;
+            padding: 1rem;
+        }
+
+        .spinner-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .admin-login-button {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+        }
+
+        .admin-login-button:hover {
+            background-color: #c82333;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        @media (max-width: 991px) {
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .btn-clear {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .content-area {
+                padding: 1rem;
+                margin: 1rem;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 0.75rem;
+            }
+
+            .admin-login-button {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen p-4 md:p-6">
-    <div class="max-w-6xl mx-auto">
+<body>
+    <!-- Loading Spinner -->
+    <div class="spinner-overlay">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 
-        <!-- Header and Clear Orders Button -->
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-            <h2 class="text-2xl font-bold text-gray-800">
-                <a href="{% url 'list_orders' %}" class="hover:text-blue-600 transition-colors">Completed Orders</a>
-            </h2>
-            <button onclick="clearCompletedOrders()"
-                class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg transition-colors shadow-md">
-                Clear Completed Orders
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">KG-BITES</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home me-2"></i>Home</a></li>
+                    {% if request.user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'my-orders' %}"><i class="fas fa-list me-2"></i>My Orders</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'cart' %}">
+                                <i class="fas fa-shopping-cart me-2"></i>Cart
+                                {% if request.user.get_cart_count > 0 %}
+                                    <span class="badge">{{request.user.get_cart_count}}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        <li class="nav-item user-info"><a class="nav-link" href="{% url 'index' %}"><i class="fas fa-user me-2"></i>{{ request.user|title }}</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-2"></i>Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}"><i class="fas fa-user-plus me-2"></i>Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content-area fade-in">
+        <div class="page-header">
+            <h1 class="page-title">Completed Orders</h1>
+            <button onclick="clearCompletedOrders()" class="btn-clear">
+                <i class="fas fa-trash-alt me-2"></i>Clear Completed Orders
             </button>
         </div>
 
-        <!-- Completed Orders Section -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-            <h3 class="text-xl font-semibold bg-blue-500 text-white p-6">Completed Orders</h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-gray-800">
-                    <thead class="bg-gray-200">
+        <div class="orders-card">
+            <div class="card-header">
+                <i class="fas fa-check-circle me-2"></i>Completed Orders
+            </div>
+            <div class="table-container">
+                <table class="orders-table">
+                    <thead>
                         <tr>
-                            <th class="px-6 py-4 text-left">Order ID</th>
-                            <th class="px-6 py-4 text-left">Customer Name</th>
-                            <th class="px-6 py-4 text-left">Total Amount</th>
-                            <th class="px-6 py-4 text-left">Status</th>
-                            <th class="px-6 py-4 text-left">Actions</th>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody>
                         {% for order in orders %}
                             {% if order.status == 'Completed' %}
-                                <tr class="hover:bg-gray-50 transition-colors" data-order-id="{{ order.id }}">
-                                    <td class="px-6 py-4">{{ order.id }}</td>
-                                    <td class="px-6 py-4">{{ order.rfid_name }}</td>
-                                    <td class="px-6 py-4">₹{{ order.total_amount }}</td>
-                                    <td class="px-6 py-4">
-                                        <form method="post" class="inline-block w-full max-w-xs">
+                                <tr data-order-id="{{ order.id }}" class="fade-in">
+                                    <td>#{{ order.id }}</td>
+                                    <td>{{ order.rfid_name }}</td>
+                                    <td>₹{{ order.total_amount }}</td>
+                                    <td>
+                                        <form method="post" class="status-form">
                                             {% csrf_token %}
                                             <input type="hidden" name="order_id" value="{{ order.id }}">
-                                            <select name="status" class="status-select w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="this.form.submit()">
+                                            <select name="status" class="status-select" onchange="this.form.submit()">
                                                 {% for status_value, status_label in order.STATUS_CHOICES %}
-                                                    <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>{{ status_label }}</option>
+                                                    <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>
+                                                        {{ status_label }}
+                                                    </option>
                                                 {% endfor %}
                                             </select>
                                         </form>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <button onclick="toggleOrderDetails({{ order.id }})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg text-sm transition-colors shadow-sm">View Details</button>
+                                    <td>
+                                        <button onclick="toggleOrderDetails({{ order.id }})" class="btn-view">
+                                            <i class="fas fa-eye me-2"></i>View Details
+                                        </button>
                                     </td>
                                 </tr>
-                                <!-- Order Details Row -->
-                                <tr class="bg-gray-50" id="order-details-{{ order.id }}" style="display: none;">
-                                    <td colspan="5" class="px-6 py-3">
-                                        <div id="details-content-{{ order.id }}" class="text-sm space-y-2">Loading details...</div>
+                                <tr>
+                                    <td colspan="5" class="p-0">
+                                        <div id="order-details-{{ order.id }}" class="order-details">
+                                            <div id="details-content-{{ order.id }}" class="p-4">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
                     </tbody>
                 </table>
+                
             </div>
         </div>
-
         <script>
             function toggleOrderDetails(orderId) {
                 const detailsRow = document.getElementById(`order-details-${orderId}`);
@@ -121,7 +410,7 @@
                     detailsRow.style.display = "none";
                 }
             }
-    
+
             function clearCompletedOrders() {
                 fetch('/clear-completed-orders/', {
                     method: 'DELETE',
@@ -149,6 +438,10 @@
                 });
             }
         </script>
-</body>
+    </div>
+    
 
-</html>
+    <!-- Footer -->
+    <footer class="text-center py-3 bg-white border-top">
+        <p class="mb-0">© {% now "Y" %} IPS-Tech. All rights reserved.</p>
+    </footer>

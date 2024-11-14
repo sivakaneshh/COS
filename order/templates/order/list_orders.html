@@ -8,6 +8,9 @@
     <title>Order Management</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
+        .change-border{
+            border-radius: 10px 10px 0 0;
+        }
         /* Custom styling for mobile view */
         @media (max-width: 640px) {
             .order-grid {
@@ -54,7 +57,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Pending Orders -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <h3 class="text-xl font-semibold bg-blue-500 text-white p-6">Pending Orders</h3>
+                <h3 class="text-xl font-semibold bg-yellow-500 text-white p-6">Pending Orders</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-gray-800">
                         <thead class="bg-gray-200">
@@ -152,8 +155,8 @@
         </div>
 
         <!-- Food Item Summary Section -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mt-8">
-            <h3 class="text-xl font-semibold bg-yellow-500 text-white p-6">Food Item Summary</h3>
+        <div class="bg-white rounded-xl shadow-lg mt-8">
+            <h3 class="text-xl font-semibold bg-blue-500 text-white p-6 change-border">Food Item Summary</h3>
             <div class="overflow-x-auto">
                 <table class="w-full text-gray-800">
                     <thead class="bg-gray-200">

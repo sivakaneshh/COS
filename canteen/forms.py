@@ -5,13 +5,13 @@ from .models import FoodItem
 class FoodItemForm(forms.ModelForm):
     class Meta:
         model = FoodItem
-        fields = ['name', 'price', 'image' ]  # Include 'image' field to allow image uploads
+        fields = ['name', 'price', 'image', 'food_choice' ]  # Include 'image' field to allow image uploads
     
     def __init__(self, *args, **kwargs):
         super(FoodItemForm, self).__init__(*args, **kwargs)
         self.fields['name'].widget.attrs.update({'class': 'form-control'})
         self.fields['price'].widget.attrs.update({'class': 'form-control'})
-        
+        self.fields['food_choice'].widget.attrs.update({'class':"form-control"})
         self.fields['image'].widget.attrs.update({'class': 'form-control'})
 
 

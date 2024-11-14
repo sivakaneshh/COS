@@ -16,6 +16,7 @@
             --text-color: #333;
             --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
             --shadow-md: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --success-color:rgb(5,150,105);
             --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
@@ -98,6 +99,22 @@
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
         }
+        .btn-download {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-download:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
 
         .orders-card {
             background: white;
@@ -117,7 +134,6 @@
 
         .table-container {
             overflow-x: auto;
-            padding: 1rem;
         }
 
         .orders-table {
@@ -317,6 +333,9 @@
             <h1 class="page-title">Completed Orders</h1>
             <button onclick="clearCompletedOrders()" class="btn-clear">
                 <i class="fas fa-trash-alt me-2"></i>Clear Completed Orders
+            </button>
+            <button onclick="clearCompletedOrders()" class="btn-download">
+                <i class="fa-solid fa-download me-2"></i>Download Summary
             </button>
         </div>
 

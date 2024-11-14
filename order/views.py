@@ -408,6 +408,17 @@ def completed_orders(request):
     """
     # Fetch all orders with status 'Completed'
     orders = Orders.objects.filter(status='Completed')
+    orders = Orders.objects.select_related('username').all()
+
+    # Create a mapping of roll numbers to RFID names
+    rfid_map = {rfid.roll_number: rfid.name for rfid in RFID.objects.all()}
+
+    # Add the RFID name to each order dynamically if available
+    for order in orders:
+        user_roll_number = order.username.username  # Assuming `username` field on `User` is the roll number in `RFID`
+        # Set `rfid_name` to the matched RFID name or fallback to the `username` if no match is found
+        order.rfid_name = rfid_map.get(user_roll_number, order.username.username)
+
     
     # Pass orders to the template
     return render(request, 'order/completed.html', {'orders': orders})

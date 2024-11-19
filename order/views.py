@@ -419,6 +419,6 @@ def completed_orders(request):
         # Set `rfid_name` to the matched RFID name or fallback to the `username` if no match is found
         order.rfid_name = rfid_map.get(user_roll_number, order.username.username)
 
-    
+    food_items = FoodItem.objects.all()
     # Pass orders to the template
-    return render(request, 'order/completed.html', {'orders': orders})
+    return render(request, 'order/completed.html', {'orders': orders,'food_items': food_items})

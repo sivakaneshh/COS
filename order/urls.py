@@ -22,4 +22,5 @@ urlpatterns = [
     #path('food-item-summary/', views.food_item_summary, name='food_item_summary'),
     path('punch', views.rfid_punch_view, name='punch'),
     path('completed-orders/', views.completed_orders, name='completed_orders'),
+    path('orders/download-summary/', views.download_summary, name='download_summary'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

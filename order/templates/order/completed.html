@@ -334,9 +334,8 @@
             <button onclick="clearCompletedOrders()" class="btn-clear">
                 <i class="fas fa-trash-alt me-2"></i>Clear Completed Orders
             </button>
-            <button onclick="clearCompletedOrders()" class="btn-download">
-                <i class="fa-solid fa-download me-2"></i>Download Summary
-            </button>
+           <a href="{% url 'download_summary' %}" class="btn btn-download">Download Summary</a>
+
         </div>
 
         <div class="orders-card">

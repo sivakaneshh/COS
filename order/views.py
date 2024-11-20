@@ -17,6 +17,10 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.utils.decorators import method_decorator
 
+from openpyxl import Workbook
+from django.http import HttpResponse
+from django.utils.timezone import now
+
 
 def index(request):
     food_items = FoodItem.objects.all()
@@ -422,3 +426,46 @@ def completed_orders(request):
     
     # Pass orders to the template
     return render(request, 'order/completed.html', {'orders': orders})
+
+def download_summary(request):
+    """
+    Generates a summary of sold items for the day and returns it as a downloadable Excel file.
+    """
+    # Get the current date
+    today = now().date()
+
+    # Filter orders completed today
+    completed_orders = Orders.objects.filter(status='Completed', created_at__date=today)
+
+    # Create a workbook and active worksheet
+    wb = Workbook()
+    ws = wb.active
+    ws.title = f"Summary_{today}"
+
+    # Write the header row
+    headers = ['Order ID', 'Username', 'Item Name', 'Quantity', 'Price', 'Total', 'Completed At']
+    ws.append(headers)
+
+    # Write data rows
+    for order in completed_orders:
+        ws.append([
+            order.id,
+            order.username.username,  # Replace with the correct attribute for username
+            order.item_name,  # Replace with the correct attribute for item name
+            order.quantity,  # Replace with the correct attribute for quantity
+            order.price,  # Replace with the correct attribute for price
+            order.quantity * order.price,  # Total = quantity * price
+            order.completed_at.strftime('%Y-%m-%d %H:%M:%S')  # Adjust as per your model
+        ])
+
+    # Set the response for downloading the Excel file
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    filename = f"sold_items_summary_{today}.xlsx"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response

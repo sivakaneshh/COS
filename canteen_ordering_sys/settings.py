@@ -67,7 +67,7 @@ DATABASES = {
         'NAME': os.getenv('DATABASE_NAME', 'cos-db'),
         'USER': os.getenv('DATABASE_USER', 'user'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD', 'cos-pass'),
-        'HOST': os.getenv('DATABASE_HOST', 'localhost'),  # 'db' matches the service name in docker-compose.yml
+        'HOST': os.getenv('DATABASE_HOST', 'db'),  # 'db' matches the service name in docker-compose.yml
         'PORT': os.getenv('DATABASE_PORT', '3306'),
     }
 }

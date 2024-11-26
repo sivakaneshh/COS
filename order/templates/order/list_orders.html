@@ -1,66 +1,76 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Management</title>
+    <title>Order Management Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
-        .change-border{
-            border-radius: 10px 10px 0 0;
+        :root {
+            --primary-gradient: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            --secondary-gradient: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
         }
-        /* Custom styling for mobile view */
-        @media (max-width: 640px) {
-            .order-grid {
-                grid-template-columns: 1fr;
-            }
+        /* body {
+            /* background: linear-gradient(to right, #f5f7fa, #c3cfe2); */
+        /* } */
+        .table-container {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .table-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
         }
         .status-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
             padding-right: 2.5rem;
             appearance: none;
-            background-position: right 0.5rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        }
+        .search-input {
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
         }
     </style>
-
-<body class="bg-gray-50 min-h-screen p-6 md:p-8">
-
+</head>
+<body class="min-h-screen p-6 md:p-12 lg:p-16">
     <div class="max-w-7xl mx-auto">
-        <!-- Header and Clear Orders Button -->
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-6">
-            <h2 class="text-3xl font-bold text-gray-800">
-                <a href="{% url 'canteenside' %}" class="hover:text-blue-600 transition-colors">Available Orders</a>
-            </h2>
-            <button onclick="window.location.href='{% url 'completed_orders' %}'" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors shadow-md">Completed Orders</button>
+        <!-- Header Section -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-12 space-y-4 sm:space-y-0">
+            <h1 class="text-4xl font-bold text-gray-800 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">Order Management</h1>
+            <button onclick="window.location.href='{% url 'completed_orders' %}'" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-full hover:scale-105 transform transition duration-300 shadow-lg">
+                Completed Orders
+            </button>
         </div>
 
         <!-- RFID Punch Section -->
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-6">
-            <div>
-                <h1 class="text-3xl font-semibold text-gray-800">Available Orders</h1>
-            </div>
-            <div class="flex items-center">
-                <h2 class="text-2xl font-semibold text-gray-800 mr-6">RFID Punch</h2>
-                <form method="post" action="{% url 'punch' %}" class="flex items-center space-x-4">
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <h2 class="text-2xl font-semibold text-gray-800">RFID Punch</h2>
+                <form method="post" action="{% url 'punch' %}" class="flex items-center space-x-4 w-full md:w-auto">
                     {% csrf_token %}
-                    <input type="text" name="rfid_tag" placeholder="Enter RFID Tag" class="border border-gray-300 rounded-lg px-6 py-3 text-lg focus:outline-none" required>
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">Punch In</button>
+                    <input type="text" name="rfid_tag" placeholder="Enter RFID Tag" class="flex-grow border-2 border-blue-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:scale-105 transform transition duration-300">
+                        Punch In
+                    </button>
                 </form>
             </div>
         </div>
 
-        <!-- Orders Table Section -->
+        <!-- Orders Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Pending Orders -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <h3 class="text-xl font-semibold bg-yellow-500 text-white p-6">Pending Orders</h3>
+            <div class="table-container bg-white rounded-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-6 flex justify-between items-center">
+                    <h3 class="text-xl font-semibold">Pending Orders</h3>
+                    <input type="text" id="pendingSearchInput" placeholder="Search Orders..." class="search-input px-3 py-2 rounded-lg text-gray-800 w-full max-w-xs">
+                </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-gray-800">
-                        <thead class="bg-gray-200">
+                    <table id="pendingOrdersTable" class="w-full text-gray-800">
+                        <thead class="bg-gray-100">
                             <tr>
                                 <th class="px-6 py-4 text-left">Order ID</th>
                                 <th class="px-6 py-4 text-left">Customer Name</th>
@@ -88,7 +98,9 @@
                                             </form>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <button onclick="toggleOrderDetails({{ order.id }})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg text-sm transition-colors shadow-sm">View Details</button>
+                                            <button onclick="toggleOrderDetails({{ order.id }})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg text-sm transition-colors shadow-sm">
+                                                View Details
+                                            </button>
                                         </td>
                                     </tr>
                                     <!-- Order Details Row -->
@@ -105,11 +117,14 @@
             </div>
 
             <!-- Ready Orders -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <h3 class="text-xl font-semibold bg-green-500 text-white p-6">Ready Orders</h3>
+            <div class="table-container bg-white rounded-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 flex justify-between items-center">
+                    <h3 class="text-xl font-semibold">Ready Orders</h3>
+                    <input type="text" id="readySearchInput" placeholder="Search Orders..." class="search-input px-3 py-2 rounded-lg text-gray-800 w-full max-w-xs">
+                </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-gray-800">
-                        <thead class="bg-gray-200">
+                    <table id="readyOrdersTable" class="w-full text-gray-800">
+                        <thead class="bg-gray-100">
                             <tr>
                                 <th class="px-6 py-4 text-left">Order ID</th>
                                 <th class="px-6 py-4 text-left">Customer Name</th>
@@ -137,7 +152,9 @@
                                             </form>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <button onclick="toggleOrderDetails({{ order.id }})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg text-sm transition-colors shadow-sm">View Details</button>
+                                            <button onclick="toggleOrderDetails({{ order.id }})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg text-sm transition-colors shadow-sm">
+                                                View Details
+                                            </button>
                                         </td>
                                     </tr>
                                     <!-- Order Details Row -->
@@ -155,11 +172,13 @@
         </div>
 
         <!-- Food Item Summary Section -->
-        <div class="bg-white rounded-xl shadow-lg mt-8">
-            <h3 class="text-xl font-semibold bg-blue-500 text-white p-6 change-border">Food Item Summary</h3>
+        <div class="bg-white rounded-xl shadow-lg mt-12">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-t-xl">
+                <h3 class="text-xl font-semibold">Food Item Summary</h3>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-gray-800">
-                    <thead class="bg-gray-200">
+                    <thead class="bg-gray-100">
                         <tr>
                             <th class="px-6 py-4 text-left">Food Item</th>
                             <th class="px-6 py-4 text-left">Quantity</th>
@@ -167,7 +186,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         {% for food_item in food_items%}
-                            <tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-6 py-4">{{ food_item.name }}</td>
                                 <td class="px-6 py-4">{{ food_item.stock_quantity }}</td>
                             </tr>
@@ -179,63 +198,76 @@
     </div>
 
     <script>
-        function toggleOrderDetails(orderId) {
-            const detailsRow = document.getElementById(`order-details-${orderId}`);
-            const detailsContent = document.getElementById(`details-content-${orderId}`);
-            
-            if (detailsRow.style.display === "none") {
-                detailsRow.style.display = "table-row";
-                
-                fetch(`/orders/details/${orderId}/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const detailsHtml = `
-                            <div class="bg-white p-4 rounded-lg shadow-sm space-y-3">
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div><span class="font-medium text-gray-700">Order ID:</span><span class="ml-2 text-gray-600">${data.order_id}</span></div>
-                                    <div><span class="font-medium text-gray-700">Amount Paid:</span><span class="ml-2 text-gray-600">₹${data.total_amount}</span></div>
-                                    <div><span class="font-medium text-gray-700">Payment Mode:</span><span class="ml-2 text-gray-600">${data.payment_mode}</span></div>
-                                </div>
-                                <div class="mt-4"><span class="font-medium text-gray-700">Items:</span><ul class="mt-2 space-y-1">${data.items.map(item => `<li class="flex justify-between items-center bg-gray-50 p-2 rounded"><span>${item.name}</span><span class="text-gray-600">₹${item.price} x ${item.quantity}</span></li>`).join('')}</ul></div>
-                            </div>
-                        `;
-                        detailsContent.innerHTML = detailsHtml;
-                    })
-                    .catch(error => {
-                        detailsContent.innerHTML = `<div class="text-red-500 p-4">Failed to load details. Please try again.</div>`;
-                        console.error("Error fetching order details:", error);
-                    });
-            } else {
-                detailsRow.style.display = "none";
-            }
-        }
+ function toggleOrderDetails(orderId) {
+    const detailsRow = document.getElementById(`order-details-${orderId}`);
+    const detailsContent = document.getElementById(`details-content-${orderId}`);
 
-        function clearCompletedOrders() {
-            fetch('/clear-completed-orders/', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            })
+    if (detailsRow.style.display === "none") {
+        detailsRow.style.display = "table-row";
+
+        fetch(`/orders/details/${orderId}/`)
             .then(response => {
-                if (response.ok) {
-                    document.querySelectorAll('tr[data-order-id]').forEach(row => {
-                        if (row.querySelector('select').value === 'Completed') {
-                            row.remove();
-                            const detailsRow = document.getElementById(`order-details-${row.dataset.orderId}`);
-                            if (detailsRow) detailsRow.remove();
-                        }
-                    });
-                    console.log('Completed orders cleared successfully.');
-                } else {
-                    console.error('Error clearing completed orders.');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                return response.json();
+            })
+            .then(data => {
+                const detailsHtml = `
+                    <div class="bg-white p-4 rounded-lg shadow-sm space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div><span class="font-medium text-gray-700">Order ID:</span><span class="ml-2 text-gray-600">${data.order_id}</span></div>
+                            <div><span class="font-medium text-gray-700">Amount Paid:</span><span class="ml-2 text-gray-600">₹${data.total_amount}</span></div>
+                            <div><span class="font-medium text-gray-700">Payment Mode:</span><span class="ml-2 text-gray-600">${data.payment_mode}</span></div>
+                        </div>
+                        <div class="mt-4">
+                            <span class="font-medium text-gray-700">Items:</span>
+                            <ul class="mt-2 space-y-1">
+                                ${data.items.map(item => `
+                                    <li class="flex justify-between items-center bg-gray-50 p-2 rounded">
+                                        <span>${item.name}</span>
+                                        <span class="text-gray-600">₹${item.price} x ${item.quantity}</span>
+                                    </li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                detailsContent.innerHTML = detailsHtml;
             })
             .catch(error => {
-                console.error('Error clearing completed orders:', error);
+                detailsContent.innerHTML = `<div class="text-red-500 p-4">Failed to load details. Please try again.</div>`;
+                console.error("Error fetching order details:", error);
             });
-        }
+    } else {
+        detailsRow.style.display = "none";
+    }
+}
+
+// Generic search function for both Pending and Ready orders
+            function searchOrders(inputId, tableId) {
+            const searchInput = document.getElementById(inputId);
+            const searchTerm = searchInput.value.toLowerCase();
+            const table = document.getElementById(tableId);
+            const rows = table.querySelectorAll("tbody tr[data-order-id]");
+
+            rows.forEach(row => {
+            const orderId = row.querySelector("td:nth-child(1)").textContent.toLowerCase();
+            const customerName = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+
+            row.style.display = orderId.includes(searchTerm) || customerName.includes(searchTerm) ? "" : "none";
+        });
+    }
+
+// Attach event listeners to search inputs
+            document.getElementById("pendingSearchInput").addEventListener("keyup", () => {
+            searchOrders("pendingSearchInput", "pendingOrdersTable");
+    });
+
+            document.getElementById("readySearchInput").addEventListener("keyup", () => {
+            searchOrders("readySearchInput", "readyOrdersTable");
+    });
+
+
     </script>
 </body>
 </html>

@@ -1,6 +1,5 @@
 {% extends 'base/base.html' %}
 {% block maincontent %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,115 +7,291 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="KG Bites - Order Management System">
     <title>KG Bites - Order Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* Card Styling */
+        .order-card {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Table Styling */
+        .table-custom thead {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.075);
+        }
+
+        /* Search Input */
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-wrapper input {
+            border-radius: 20px;
+            padding-left: 40px;
+        }
+
+        .search-wrapper .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #007bff;
+        }
+
+        /* Order Details */
+        .order-details {
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        /* Status Dropdown */
+        .status-dropdown {
+            border-radius: 4px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right .75rem center;
+            background-size: 8px 10px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            background-color: #fff;
+            border: 1px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .table-responsive {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
 </head>
-<body class="bg-light text-dark d-flex flex-column min-vh-100">
+<body class="bg-light text-dark">
+    <main class="container-fluid my-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h1 class="h4">
+                        <i class="fas fa-shopping-basket me-2"></i>Completed Orders
+                    </h1>
+                    <div class="btn-group" role="group" aria-label="Order Actions">
+                        <button onclick="clearCompletedOrders()" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash-alt me-1"></i>Clear Completed Orders
+                        </button>
+                        <a href="{% url 'download_summary' %}" class="btn btn-success btn-sm">
+                            <i class="fas fa-download me-1"></i>Download Summary
+                        </a>
+                        <a href="{% url 'transfer_completed' %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-exchange-alt me-1"></i>Transfer Completed
+                        </a>
+                    </div>
+                </div>
 
-
-    <main class="container my-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="h4">Completed Orders</h1>
-            <div>
-                <button onclick="clearCompletedOrders()" class="btn btn-danger btn-sm">Clear Completed Orders</button>
-                <a href="{% url 'download_summary' %}" class="btn btn-success btn-sm">Download Summary</a>
-            </div>
-            <div>
-                <a href="{% url 'transfer_completed' %}" class="btn btn-success btn-sm">Transfer complted</a>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header bg-primary text-white">Completed Orders</div>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Customer Name</th>
-                            <th>Total Amount</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in orders %}
-                            {% if order.status == 'Completed' %}
+                <div class="card order-card shadow-sm">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-list me-2"></i>Order List</span>
+                        <div class="search-wrapper" style="width: 250px;">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="searchOrders" class="form-control form-control-sm" placeholder="Search orders...">
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-custom table-striped table-hover mb-0" id="ordersTable">
+                            <thead class="table-light">
                                 <tr>
-                                    <td>#{{ order.id }}</td>
-                                    <td>{{ order.rfid_name }}</td>
-                                    <td>₹{{ order.total_amount }}</td>
-                                    <td>
-                                        <form method="post">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="order_id" value="{{ order.id }}">
-                                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                                                {% for status_value, status_label in order.STATUS_CHOICES %}
-                                                    <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>
-                                                        {{ status_label }}
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <button onclick="toggleOrderDetails({{ order.id }})" class="btn btn-primary btn-sm">View Details</button>
-                                    </td>
+                                    <th>Order ID</th>
+                                    <th>Customer Name</th>
+                                    <th>Total Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
-                                <tr>
-                                    <td colspan="5">
-                                        <div id="order-details-{{ order.id }}" class="d-none">
-                                            <div id="details-content-{{ order.id }}" class="p-3 bg-light">
-                                                <div class="spinner-border text-primary" role="status"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                    {% if order.status == 'Completed' %}
+                                        <tr data-order-id="{{ order.id }}">
+                                            <td>#{{ order.id }}</td>
+                                            <td>{{ order.rfid_name }}</td>
+                                            <td>₹{{ order.total_amount|floatformat:2 }}</td>
+                                            <td>
+                                                <form method="post" class="status-change-form">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                                                    <select name="status" class="form-select form-select-sm status-dropdown">
+                                                        {% for status_value, status_label in order.STATUS_CHOICES %}
+                                                            <option value="{{ status_value }}" 
+                                                                {% if order.status == status_value %}selected{% endif %}>
+                                                                {{ status_label }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </form>
+                                            </td>
+                                            <td>
+                                                <button onclick="toggleOrderDetails({{ order.id }})" 
+                                                        class="btn btn-primary btn-sm view-details-btn">
+                                                    <i class="fas fa-eye me-1"></i>View Details
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr class="order-details-row d-none">
+                                            <td colspan="5" class="p-0">
+                                                <div id="order-details-{{ order.id }}" class="order-details p-3">
+                                                    <div id="details-content-{{ order.id }}">
+                                                        <div class="spinner-border text-primary" role="status"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if not orders %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
+                        <p class="text-muted">No completed orders found.</p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function toggleOrderDetails(orderId) {
-            const detailsDiv = document.getElementById(`order-details-${orderId}`);
-            const detailsContent = document.getElementById(`details-content-${orderId}`);
+            const orderRow = document.querySelector(`tr[data-order-id="${orderId}"]`);
+            const detailsRow = orderRow.nextElementSibling;
+            const detailsContent = detailsRow.querySelector(`#details-content-${orderId}`);
             
-            if (detailsDiv.classList.contains('d-none')) {
-                detailsDiv.classList.remove('d-none');
+            detailsRow.classList.toggle('d-none');
+            
+            if (!detailsRow.classList.contains('d-none')) {
                 fetch(`/orders/details/${orderId}/`)
                     .then(response => response.json())
                     .then(data => {
                         const itemsHtml = data.items.map(item => 
-                            `<li>${item.name} - ₹${item.price} x ${item.quantity}</li>`).join('');
+                            `<div class="d-flex justify-content-between">
+                                <span>${item.name}</span>
+                                <span>₹${item.price} x ${item.quantity}</span>
+                             </div>`).join('');
+                        
                         detailsContent.innerHTML = `
-                            <strong>Order ID:</strong> ${data.order_id}<br>
-                            <strong>Amount Paid:</strong> ₹${data.total_amount}<br>
-                            <strong>Items:</strong><ul>${itemsHtml}</ul>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Order Details</h6>
+                                    <p><strong>Order ID:</strong> #${data.order_id}</p>
+                                    <p><strong>Total Amount:</strong> ₹${data.total_amount}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Items</h6>
+                                    <div class="list-group">
+                                        ${itemsHtml}
+                                    </div>
+                                </div>
+                            </div>
                         `;
                     })
                     .catch(() => {
-                        detailsContent.innerHTML = `<div class="text-danger">Failed to load details.</div>`;
+                        detailsContent.innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Failed to load order details.
+                            </div>
+                        `;
                     });
-            } else {
-                detailsDiv.classList.add('d-none');
             }
         }
 
         function clearCompletedOrders() {
-            fetch('/clear-completed-orders/', {
-                method: 'DELETE',
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
-            })
-            .then(response => {
-                if (response.ok) {
-                    document.querySelectorAll('tr').forEach(row => {
-                        if (row.querySelector('select')?.value === 'Completed') row.remove();
-                    });
-                }
-            });
+            const confirmDelete = confirm('Are you sure you want to clear all completed orders?');
+            
+            if (confirmDelete) {
+                fetch('/clear-completed-orders/', {
+                    method: 'DELETE',
+                    headers: { 
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        const completedRows = document.querySelectorAll('tr[data-order-id]');
+                        completedRows.forEach(row => row.remove());
+                    }
+                });
+            }
         }
+
+        // Search functionality
+        document.getElementById('searchOrders').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#ordersTable tbody tr[data-order-id]');
+            
+            rows.forEach(row => {
+                const customerName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const orderId = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                
+                row.style.display = (customerName.includes(searchTerm) || orderId.includes(searchTerm)) 
+                    ? '' 
+                    : 'none';
+            });
+        });
+
+        // Status change event listener
+        document.querySelectorAll('.status-change-form').forEach(form => {
+            form.addEventListener('change', function(event) {
+                const formData = new FormData(this);
+                
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Status update failed');
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>

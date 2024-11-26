@@ -209,7 +209,6 @@
         }
     }
 </style>
-
 <div class="page-container">
     <div class="food-grid">
         {% for f in food %}
@@ -230,11 +229,24 @@
                     
                     {% if f.stock_quantity > 0 %}
                         <div class="button-container">
-                            <!-- Add to Cart with the increase action -->
-                            <a href="{% url 'update-cart' f.id %}?name=increase_cart" class="btn btn-cart">
-                                <i class="fa-solid fa-cart-shopping"></i>
-                                Add to Cart
-                            </a>
+                            {% if f.id in cart_items %}
+                                <!-- Display Increase/Decrease buttons if the item is in the cart -->
+                                <div class="quantity-controls">
+                                    <a href="{% url 'update-cart' f.id %}?name=decrease_cart" class="btn btn-decrease">
+                                        <i class="fa-solid fa-minus"></i>
+                                    </a>
+                                    <span class="quantity">{{ cart_items.f.id }}</span>
+                                    <a href="{% url 'update-cart' f.id %}?name=increase_cart" class="btn btn-increase">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </a>
+                                </div>
+                            {% else %}
+                                <!-- Display Add to Cart button if the item is not in the cart -->
+                                <a href="{% url 'update-cart' f.id %}?name=increase_cart" class="btn btn-cart">
+                                    <i class="fa-solid fa-cart-shopping"></i>
+                                    Add to Cart
+                                </a>
+                            {% endif %}
                             <!-- Buy Now button -->
                             <a href="{% url 'buy-now' f.id %}" class="btn btn-buy">
                                 <i class="fa-solid fa-credit-card"></i>
@@ -251,5 +263,6 @@
         {% endfor %}
     </div>
 </div>
+
 
 {% endblock maincontent %}

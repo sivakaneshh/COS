@@ -119,7 +119,6 @@ def cart(request):
     total_amount = sum(item.food.price * item.quantity for item in cart_items)
     return render(request, 'order/cart.html', {'cartitems': cart_items, 'total_amount': total_amount})
 
-
 @transaction.atomic
 def checkout(request):
     if request.method == 'POST':
@@ -350,8 +349,7 @@ def list_orders(request):
     })
 
 
-
-@login_required(login_url='/login/')
+@login_required
 def rfid_punch_view(request):
     if request.method == 'POST':
         # Handling RFID punch form submission
@@ -360,28 +358,32 @@ def rfid_punch_view(request):
             try:
                 # Get the RFID object by RFID tag
                 rfid_obj = RFID.objects.get(rfid_tag=rfid_tag)
+                
                 # Retrieve the user associated with the RFID roll number
                 user = User.objects.get(username=rfid_obj.roll_number)
-
-                # Check for any pending orders for the user
-                pending_orders = Orders.objects.filter(username=user, status='Pending')
+                 
+                # Check for any pending or packed orders for the user
+                pending_orders = Orders.objects.filter(
+                    username=user, 
+                    status__in=['Pending', 'Packed']
+                )
+                
                 if pending_orders.exists():
-                    for order in pending_orders:
-                        order.status = 'Completed'
-                        order.save()
-                    messages.success(request, 'Orders marked as completed.')
+                    pending_orders.update(status='Completed')
+                    messages.success(request, f'{pending_orders.count()} order(s) marked as completed.')
                 else:
                     messages.info(request, 'No pending orders found for this user.')
-
+             
             except (RFID.DoesNotExist, User.DoesNotExist):
                 messages.error(request, 'Invalid RFID tag.')
+            
             return redirect('punch')
-
+        
         # Handling individual order status update form submission
         elif 'order_id' in request.POST:
             order_id = request.POST.get('order_id')
             new_status = request.POST.get('status')
-
+             
             try:
                 order = Orders.objects.get(id=order_id)
                 order.status = new_status
@@ -389,20 +391,20 @@ def rfid_punch_view(request):
                 messages.success(request, f'Order {order_id} status updated successfully.')
             except Orders.DoesNotExist:
                 messages.error(request, 'Order not found.')
+            
             return redirect('punch')
-
+    
     # For GET requests: Retrieve orders and render the template with RFID names included
     orders = Orders.objects.select_related('username').all()
-
+    
     # Create a mapping of roll numbers to RFID names for display purposes
-    rfid_map = {rfid.roll_number: rfid.name for rfid in RFID.objects.all()}
-
-    # Attach `rfid_name` to each order for use in the template
+    rfid_map = dict(RFID.objects.values_list('roll_number', 'name'))
+    
+    # Annotate orders with RFID names
     for order in orders:
-        user_roll_number = order.username.username  # Assuming `username` field on `User` is the roll number in `RFID`
-        # Set `rfid_name` to the matched RFID name or fallback to the `username` if no match is found
+        user_roll_number = order.username.username
         order.rfid_name = rfid_map.get(user_roll_number, order.username.username)
-
+    
     return render(request, 'order/list_orders.html', {'orders': orders})
 
 

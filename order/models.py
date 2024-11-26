@@ -58,7 +58,19 @@ class OrderItems(models.Model):
     quantity = models.PositiveIntegerField()
     item_total = models.IntegerField()
 
-from django.db import models
+class Completed(models.Model):
+    #order = models.ForeignKey("Orders", on_delete=models.CASCADE, related_name="completed_items")
+    food_name = models.CharField(max_length=50)  # Extracted from OrderItems.name
+    food_price = models.IntegerField()  # Extracted from OrderItems.price
+    food_quantity = models.PositiveIntegerField(default=0)  # Cumulative quantity
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES)  # Mirrors Orders.status
+    payment_type = models.CharField(max_length=50, choices=PAYMENT_CHOICES)  # Mirrors Orders.payment_mode
+
+# Prevent duplicate product entries for the same order
+
+    def __str__(self):
+        return f"Completed: {self.food_name} (Order {self.order.id}) - Quantity: {self.food_quantity}"
+
 
 class RFID(models.Model):
     name = models.CharField(max_length=100)                     
@@ -67,4 +79,5 @@ class RFID(models.Model):
 
     def __str__(self):
         return f"{self.roll_number} - {self.name} - {self.rfid_tag}"
+
 

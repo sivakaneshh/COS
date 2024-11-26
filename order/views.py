@@ -8,7 +8,7 @@ from django.db import transaction
 import random
 from django.views import View
 from canteen.models import FoodItem
-from .models import Cart, Orders, OrderItems,RFID
+from .models import Cart, Orders, OrderItems,RFID,Completed
 from .forms import LoginRegisterForm
 from canteen.forms import FoodItemForm
 
@@ -413,7 +413,6 @@ def completed_orders(request):
     # Fetch all orders with status 'Completed'
     orders = Orders.objects.filter(status='Completed')
     orders = Orders.objects.select_related('username').all()
-
     # Create a mapping of roll numbers to RFID names
     rfid_map = {rfid.roll_number: rfid.name for rfid in RFID.objects.all()}
 
@@ -427,15 +426,15 @@ def completed_orders(request):
     # Pass orders to the template
     return render(request, 'order/completed.html', {'orders': orders})
 
+
+
 def download_summary(request):
-    """
-    Generates a summary of sold items for the day and returns it as a downloadable Excel file.
-    """
+
     # Get the current date
     today = now().date()
 
-    # Filter orders completed today
-    completed_orders = Orders.objects.filter(status='Completed', created_at__date=today)
+    # Fetch completed items for the day
+    completed_items = Completed.objects.filter(status="Completed")
 
     # Create a workbook and active worksheet
     wb = Workbook()
@@ -443,19 +442,19 @@ def download_summary(request):
     ws.title = f"Summary_{today}"
 
     # Write the header row
-    headers = ['Order ID', 'Username', 'Item Name', 'Quantity', 'Price', 'Total', 'Completed At']
+    headers = [ 'Food Name', 'Quantity', 'Price', 'Item Total', 'Payment Type']
     ws.append(headers)
 
     # Write data rows
-    for order in completed_orders:
+    for item in completed_items:
         ws.append([
-            order.id,
-            order.username.username,  # Replace with the correct attribute for username
-            order.item_name,  # Replace with the correct attribute for item name
-            order.quantity,  # Replace with the correct attribute for quantity
-            order.price,  # Replace with the correct attribute for price
-            order.quantity * order.price,  # Total = quantity * price
-            order.completed_at.strftime('%Y-%m-%d %H:%M:%S')  # Adjust as per your model
+           
+            item.food_name,  # Food Name
+            item.food_quantity,  # Quantity
+            item.food_price,  # Price per item
+            item.food_quantity * item.food_price,  # Item Total
+            item.payment_type,  # Payment Type
+            #item.order.order_datetime.strftime('%Y-%m-%d %H:%M:%S'),  # Order Time
         ])
 
     # Set the response for downloading the Excel file
@@ -469,3 +468,44 @@ def download_summary(request):
     wb.save(response)
 
     return response
+
+
+from django.shortcuts import redirect
+
+def transfer_completed_orders(request):
+    """
+    Transfers all items from orders marked as 'Completed' to the Completed model.
+    """
+    if request.method == 'POST':
+        # Fetch all orders with the status 'Completed'
+        completed_orders = Orders.objects.filter(status='Completed')
+        print(f"Found {completed_orders.count()} completed orders.")  # Debugging output
+        
+        for order in completed_orders:
+            # Fetch related order items for each completed order
+            order_items = OrderItems.objects.filter(order=order)
+            #print(f"Processing Order {order.id} with {order_items.count()} items.")  # Debugging output
+
+            for item in order_items:
+                # Check if entry exists and update quantity, or create new entry
+                completed_item, created = Completed.objects.get_or_create(
+                    order=order,  # Link to the order
+                    food_name=item.name,
+                    defaults={
+                        'food_price': item.price,
+                        'food_quantity': item.quantity,
+                        'status': order.status,
+                        'payment_type': order.payment_mode
+                    }
+                )
+                
+                if not created:
+                    # If entry exists, update the quantity
+                    completed_item.food_quantity += item.quantity
+                    completed_item.save()
+
+        # Redirect to the previous page or a specific page after transfer
+        return redirect(request.META.get('HTTP_REFERER', '/'))  # Redirects back to the referring page
+
+    # Handle non-POST requests
+    return redirect(request.META.get('HTTP_REFERER', '/'))  # Also redirect in case of invalid request method

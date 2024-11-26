@@ -1,349 +1,33 @@
+{% extends 'base/base.html' %}
+{% block maincontent %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="KG Bites - Order Management System">
     <title>KG Bites - Order Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <style>
-        :root {
-            --primary-color: #007bff;
-            --secondary-color: #dc3545;
-            --bg-color: #f8f9fa;
-            --text-color: #333;
-            --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
-            --shadow-md: 0 2px 10px rgba(0, 0, 0, 0.1);
-            --success-color:rgb(5,150,105);
-            --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .navbar {
-            background-color: var(--primary-color);
-            padding: 0.75rem 1rem;
-            box-shadow: var(--shadow-md);
-        }
-
-        .navbar-brand {
-            color: white !important;
-            padding: 0.5rem 0;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .nav-link {
-            color: white !important;
-            padding: 0.75rem 1rem !important;
-            transition: all 0.3s ease;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-1px);
-        }
-
-        .content-area {
-            flex: 1;
-            padding: 2rem;
-            background-color: white;
-            box-shadow: var(--shadow-md);
-            border-radius: 12px;
-            margin: 1.5rem auto;
-            width: 95%;
-            max-width: 1200px;
-            position: relative;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding: 0 1rem;
-        }
-
-        .page-title {
-            font-size: 1.75rem;
-            font-weight: bold;
-            color: var(--text-color);
-            margin: 0;
-        }
-
-        .btn-clear {
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn-clear:hover {
-            background-color: #c82333;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-        .btn-download {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn-download:hover {
-            background-color: #c82333;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .orders-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
-
-        .card-header {
-            background: var(--primary-color);
-            color: white;
-            padding: 1.25rem;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        .orders-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .orders-table th {
-            background-color: var(--bg-color);
-            padding: 1rem;
-            font-weight: 600;
-            color: var(--text-color);
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        .orders-table td {
-            padding: 1rem;
-            border-bottom: 1px solid #dee2e6;
-            vertical-align: middle;
-        }
-
-        .orders-table tbody tr:hover {
-            background-color: rgba(0, 123, 255, 0.05);
-        }
-
-        .status-select {
-            width: 100%;
-            padding: 0.5rem 2rem 0.5rem 1rem;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            appearance: none;
-            background-color: white;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23495057' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .status-select:hover {
-            border-color: var(--primary-color);
-        }
-
-        .btn-view {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn-view:hover {
-            background-color: #0056b3;
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .order-details {
-            background-color: var(--bg-color);
-            padding: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .order-details.active {
-            max-height: 500px;
-            padding: 1rem;
-        }
-
-        .spinner-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .admin-login-button {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-            z-index: 1000;
-        }
-
-        .admin-login-button:hover {
-            background-color: #c82333;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        @media (max-width: 991px) {
-            .page-header {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
-
-            .btn-clear {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .content-area {
-                padding: 1rem;
-                margin: 1rem;
-            }
-
-            .orders-table th,
-            .orders-table td {
-                padding: 0.75rem;
-            }
-
-            .admin-login-button {
-                bottom: 1rem;
-                right: 1rem;
-                padding: 0.5rem 1rem;
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Animation classes */
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<body class="bg-light text-dark d-flex flex-column min-vh-100">
 
-<body>
-    <!-- Loading Spinner -->
-    <div class="spinner-overlay">
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="/">KG-BITES</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home me-2"></i>Home</a></li>
-                    {% if request.user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'my-orders' %}"><i class="fas fa-list me-2"></i>My Orders</a></li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'cart' %}">
-                                <i class="fas fa-shopping-cart me-2"></i>Cart
-                                {% if request.user.get_cart_count > 0 %}
-                                    <span class="badge">{{request.user.get_cart_count}}</span>
-                                {% endif %}
-                            </a>
-                        </li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-                        <li class="nav-item user-info"><a class="nav-link" href="{% url 'index' %}"><i class="fas fa-user me-2"></i>{{ request.user|title }}</a></li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-2"></i>Login</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}"><i class="fas fa-user-plus me-2"></i>Register</a></li>
-                    {% endif %}
-                </ul>
+    <main class="container my-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h4">Completed Orders</h1>
+            <div>
+                <button onclick="clearCompletedOrders()" class="btn btn-danger btn-sm">Clear Completed Orders</button>
+                <a href="{% url 'download_summary' %}" class="btn btn-success btn-sm">Download Summary</a>
+            </div>
+            <div>
+                <a href="{% url 'transfer_completed' %}" class="btn btn-success btn-sm">Transfer complted</a>
             </div>
         </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="content-area fade-in">
-        <div class="page-header">
-            <h1 class="page-title">Completed Orders</h1>
-            <button onclick="clearCompletedOrders()" class="btn-clear">
-                <i class="fas fa-trash-alt me-2"></i>Clear Completed Orders
-            </button>
-           <a href="{% url 'download_summary' %}" class="btn btn-download">Download Summary</a>
-
-        </div>
-
-        <div class="orders-card">
-            <div class="card-header">
-                <i class="fas fa-check-circle me-2"></i>Completed Orders
-            </div>
-            <div class="table-container">
-                <table class="orders-table">
+        <div class="card">
+            <div class="card-header bg-primary text-white">Completed Orders</div>
+            <div class="table-responsive">
+                <table class="table table-striped">
                     <thead>
                         <tr>
                             <th>Order ID</th>
@@ -356,15 +40,15 @@
                     <tbody>
                         {% for order in orders %}
                             {% if order.status == 'Completed' %}
-                                <tr data-order-id="{{ order.id }}" class="fade-in">
+                                <tr>
                                     <td>#{{ order.id }}</td>
                                     <td>{{ order.rfid_name }}</td>
                                     <td>₹{{ order.total_amount }}</td>
                                     <td>
-                                        <form method="post" class="status-form">
+                                        <form method="post">
                                             {% csrf_token %}
                                             <input type="hidden" name="order_id" value="{{ order.id }}">
-                                            <select name="status" class="status-select" onchange="this.form.submit()">
+                                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
                                                 {% for status_value, status_label in order.STATUS_CHOICES %}
                                                     <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>
                                                         {{ status_label }}
@@ -374,18 +58,14 @@
                                         </form>
                                     </td>
                                     <td>
-                                        <button onclick="toggleOrderDetails({{ order.id }})" class="btn-view">
-                                            <i class="fas fa-eye me-2"></i>View Details
-                                        </button>
+                                        <button onclick="toggleOrderDetails({{ order.id }})" class="btn btn-primary btn-sm">View Details</button>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td colspan="5" class="p-0">
-                                        <div id="order-details-{{ order.id }}" class="order-details">
-                                            <div id="details-content-{{ order.id }}" class="p-4">
-                                                <div class="spinner-border text-primary" role="status">
-                                                    <span class="visually-hidden">Loading...</span>
-                                                </div>
+                                    <td colspan="5">
+                                        <div id="order-details-{{ order.id }}" class="d-none">
+                                            <div id="details-content-{{ order.id }}" class="p-3 bg-light">
+                                                <div class="spinner-border text-primary" role="status"></div>
                                             </div>
                                         </div>
                                     </td>
@@ -394,72 +74,50 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                
             </div>
         </div>
-        <script>
-            function toggleOrderDetails(orderId) {
-                const detailsRow = document.getElementById(`order-details-${orderId}`);
-                const detailsContent = document.getElementById(`details-content-${orderId}`);
-                
-                if (detailsRow.style.display === "none") {
-                    detailsRow.style.display = "table-row";
-                    
-                    fetch(`/orders/details/${orderId}/`)
-                        .then(response => response.json())
-                        .then(data => {
-                            const detailsHtml = `
-                                <div class="bg-white p-4 rounded-lg shadow-sm space-y-3">
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div><span class="font-medium text-gray-700">Order ID:</span><span class="ml-2 text-gray-600">${data.order_id}</span></div>
-                                        <div><span class="font-medium text-gray-700">Amount Paid:</span><span class="ml-2 text-gray-600">₹${data.total_amount}</span></div>
-                                        <div><span class="font-medium text-gray-700">Payment Mode:</span><span class="ml-2 text-gray-600">${data.payment_mode}</span></div>
-                                    </div>
-                                    <div class="mt-4"><span class="font-medium text-gray-700">Items:</span><ul class="mt-2 space-y-1">${data.items.map(item => `<li class="flex justify-between items-center bg-gray-50 p-2 rounded"><span>${item.name}</span><span class="text-gray-600">₹${item.price} x ${item.quantity}</span></li>`).join('')}</ul></div>
-                                </div>
-                            `;
-                            detailsContent.innerHTML = detailsHtml;
-                        })
-                        .catch(error => {
-                            detailsContent.innerHTML = `<div class="text-red-500 p-4">Failed to load details. Please try again.</div>`;
-                            console.error("Error fetching order details:", error);
-                        });
-                } else {
-                    detailsRow.style.display = "none";
+    </main>
+
+    <script>
+        function toggleOrderDetails(orderId) {
+            const detailsDiv = document.getElementById(`order-details-${orderId}`);
+            const detailsContent = document.getElementById(`details-content-${orderId}`);
+            
+            if (detailsDiv.classList.contains('d-none')) {
+                detailsDiv.classList.remove('d-none');
+                fetch(`/orders/details/${orderId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const itemsHtml = data.items.map(item => 
+                            `<li>${item.name} - ₹${item.price} x ${item.quantity}</li>`).join('');
+                        detailsContent.innerHTML = `
+                            <strong>Order ID:</strong> ${data.order_id}<br>
+                            <strong>Amount Paid:</strong> ₹${data.total_amount}<br>
+                            <strong>Items:</strong><ul>${itemsHtml}</ul>
+                        `;
+                    })
+                    .catch(() => {
+                        detailsContent.innerHTML = `<div class="text-danger">Failed to load details.</div>`;
+                    });
+            } else {
+                detailsDiv.classList.add('d-none');
+            }
+        }
+
+        function clearCompletedOrders() {
+            fetch('/clear-completed-orders/', {
+                method: 'DELETE',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.querySelectorAll('tr').forEach(row => {
+                        if (row.querySelector('select')?.value === 'Completed') row.remove();
+                    });
                 }
-            }
-
-            function clearCompletedOrders() {
-                fetch('/clear-completed-orders/', {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    }
-                })
-                .then(response => {
-                    if (response.ok) {
-                        document.querySelectorAll('tr[data-order-id]').forEach(row => {
-                            if (row.querySelector('select').value === 'Completed') {
-                                row.remove();
-                                const detailsRow = document.getElementById(`order-details-${row.dataset.orderId}`);
-                                if (detailsRow) detailsRow.remove();
-                            }
-                        });
-                        console.log('Completed orders cleared successfully.');
-                    } else {
-                        console.error('Error clearing completed orders.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error clearing completed orders:', error);
-                });
-            }
-        </script>
-    </div>
-    
-
-    <!-- Footer -->
-    <footer class="text-center py-3 bg-white border-top">
-        <p class="mb-0">© {% now "Y" %} IPS-Tech. All rights reserved.</p>
-    </footer>
+            });
+        }
+    </script>
+</body>
+</html>
+{% endblock maincontent %}

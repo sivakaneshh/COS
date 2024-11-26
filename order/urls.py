@@ -23,4 +23,5 @@ urlpatterns = [
     path('punch', views.rfid_punch_view, name='punch'),
     path('completed-orders/', views.completed_orders, name='completed_orders'),
     path('orders/download-summary/', views.download_summary, name='download_summary'),
+     path('transfer-items',views.transfer_completed_orders, name='transfer_completed'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

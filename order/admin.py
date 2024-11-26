@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Cart, Orders, OrderItems,RFID
+from .models import Cart, Orders, OrderItems,RFID,Completed
 
 # Register your models here.
 @admin.register(Cart)
@@ -18,3 +18,7 @@ class OrderItemsAdmin(admin.ModelAdmin):
 class RFIDAdmin(admin.ModelAdmin):
     list_display = ('roll_number', 'name', 'rfid_tag')  # Columns to display
     search_fields = ('roll_number', 'name')  # Add search functionality
+
+@admin.register(Completed)
+class CompletedAdmin(admin.ModelAdmin):
+    list_display = (  'food_name', 'food_price', 'food_quantity','status','payment_type')

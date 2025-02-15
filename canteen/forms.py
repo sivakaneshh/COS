@@ -9,10 +9,8 @@ class FoodItemForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super(FoodItemForm, self).__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs.update({'class': 'form-control'})
-        self.fields['price'].widget.attrs.update({'class': 'form-control'})
-        self.fields['food_choice'].widget.attrs.update({'class':"form-control"})
-        self.fields['image'].widget.attrs.update({'class': 'form-control'})
+        for field in ['name', 'price', 'food_choice', 'image']:
+            self.fields[field].widget.attrs.update({'class': 'form-control'})
 
 
 

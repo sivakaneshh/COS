@@ -248,13 +248,16 @@
         {% block payment-gateway %}{% endblock payment-gateway %}
     </div>
 
-    {% if request.user.is_staff %}
-    <div class="position-fixed bottom-0 end-0 p-3">
-        <a href="{% url 'canteenside' %}" class="admin-login-button">
-            <i class="fas fa-lock me-2"></i>Admin Dashboard
-        </a>
-    </div>
+    {% load custom_filters %}
+
+    {% if request.user.is_staff or request.user|has_group:"canteen" %}
+        <div class="position-fixed bottom-0 end-0 p-3">
+            <a href="{% url 'canteenside' %}" class="admin-login-button">
+                <i class="fas fa-lock me-2"></i> Admin Dashboard
+            </a>
+        </div>
     {% endif %}
+    
 
         <!-- Footer -->
         <footer class="bg-white py-2 border-top">
